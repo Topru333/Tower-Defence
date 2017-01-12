@@ -44,7 +44,7 @@ public class TargetSystem : MonoBehaviour {
         if (currentTarget != null) {
             RotationTo(currentTarget); // Поворот верхушки к цели
             if(shootType.timer >= shootType.timeBetweenBullets && Time.timeScale != 0)
-            shootType.Shoot(currentTarget);
+                shootType.Shoot(currentTarget);
         }
     }
 
