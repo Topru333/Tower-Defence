@@ -2,27 +2,39 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(ShootType))]
 public class TargetSystem : MonoBehaviour {
 
     /// <summary>
     /// Скрипт для поворота башни к цели и дальнейших действий
     /// </summary>
+    #region Parameters
+    public bool Rotate = false;
+
+    public bool rotateY;
+
+    public bool rotateX;
+
+    public Transform centerGunX;
 
     public Transform upOfTower; // Верхушка башни 
 
-    [Range(0, 200)]
+    [Range(0,360)]
     public float ViewRadius = 50f; // Радиус башни
-    [Range(0, 360)]
+    [Range(0,360)]
     public float ViewAngle = 90f; // Угол обзора башни
+    [Range(1,50)]
     public float dampingRotation = 5f; // Скорость поворота
 
     public LayerMask targetsMask; // Возможные цели
-    public LayerMask obstacleMask; // Стены через которые башня не видет
+    public LayerMask wallMask; // Стены через которые башня не видет
 
-    public List<Transform> visibleTargets = new List<Transform>();// Список всех в поле видимости
+    
     public Transform currentTarget; // Цель для атаки на данный момент
 
     ShootType shootType;
+    public List<Transform> visibleTargets = new List<Transform>();// Список всех в поле видимости
+    #endregion
 
     // Поиск цели с в промежуток времени
     IEnumerator FindTargetsWithDelay (float delay) {
@@ -34,22 +46,21 @@ public class TargetSystem : MonoBehaviour {
 
     void Awake () {
         StartCoroutine("FindTargetsWithDelay", .2f);
-    }
-    void Start () {
-        if (upOfTower == null) upOfTower = transform; // Если верхушки нету то башня обозначает себя как верхушку.
         shootType = GetComponent<ShootType>();
     }
 
     void FixedUpdate () {
         if (currentTarget != null) {
             RotationTo(currentTarget); // Поворот верхушки к цели
-            if(shootType.timer >= shootType.timeBetweenBullets && Time.timeScale != 0)
-                shootType.Shoot(currentTarget);
+            foreach(ShootType.Attack a in shootType.Attacks) {
+                    a.Shoot(visibleTargets);
+            }
+            
         }
     }
 
     // Перевод из градусов в радианы
-    public Vector3 DirFromAngle (float angleInDegrees) {
+    public  Vector3 DirFromAngle (float angleInDegrees) {
         return new Vector3(Mathf.Sin(Mathf.Deg2Rad * angleInDegrees), 0, Mathf.Cos(angleInDegrees * Mathf.Deg2Rad));
     }
 
@@ -64,7 +75,7 @@ public class TargetSystem : MonoBehaviour {
             if (Vector3.Angle(upOfTower.forward, dirToTarget) < ViewAngle / 2) {
                 float dstToTarget = Vector3.Distance(upOfTower.position, target.position);
 
-                if (!Physics.Raycast(upOfTower.position, dirToTarget, dstToTarget, obstacleMask)) { // Проверка на стены между верхушкой и целью
+                if (!Physics.Raycast(upOfTower.position, dirToTarget, dstToTarget, wallMask)) { // Проверка на стены между верхушкой и целью
                     visibleTargets.Add(target);
                     currentTarget = target;
                 }
@@ -75,10 +86,21 @@ public class TargetSystem : MonoBehaviour {
 
     // Поворот верхушки
     void RotationTo (Transform target) {
-        var lookPos = target.position - upOfTower.position;
-        lookPos.y = 0;
-        var rotation = Quaternion.LookRotation(lookPos);
-        upOfTower.rotation = Quaternion.Slerp(upOfTower.rotation, rotation, Time.deltaTime * dampingRotation);
+        if (Rotate) {
+            var lookPosUp = target.position - upOfTower.position;
+            var lookPosGun = lookPosUp;
+
+            if (rotateY) {
+                lookPosUp.y = 0;
+                var rotationUp = Quaternion.LookRotation(lookPosUp);
+                upOfTower.rotation = Quaternion.Slerp(upOfTower.rotation, rotationUp, Time.deltaTime * dampingRotation);
+            }
+            if (rotateX && centerGunX != null) {
+                var rotationGun = Quaternion.LookRotation(lookPosGun);
+                centerGunX.rotation = Quaternion.Slerp(centerGunX.rotation, rotationGun, Time.deltaTime * dampingRotation);
+            }
+        }
+        
     }
 
 }
