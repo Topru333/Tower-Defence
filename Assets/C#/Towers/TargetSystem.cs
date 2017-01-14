@@ -2,38 +2,29 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(ShootType))]
+
 public class TargetSystem : MonoBehaviour {
 
     /// <summary>
     /// Скрипт для поворота башни к цели и дальнейших действий
     /// </summary>
     #region Parameters
-    public bool Rotate = false;
-
-    public bool rotateY;
-
-    public bool rotateX;
-
-    public Transform centerGunX;
-
-    public Transform upOfTower; // Верхушка башни 
-
+    public bool Rotate = false;         // Вращается ли башня
+    public bool rotateY;                // Ось вращения пушки
+    public bool rotateX;                // Ось вращения верхукши
+    public Transform centerGunX;        // Пушка для вращения по Y
+    public Transform upOfTower;         // Верхушка башни 
     [Range(0,360)]
-    public float ViewRadius = 50f; // Радиус башни
+    public float ViewRadius = 50f;      // Радиус башни
     [Range(0,360)]
-    public float ViewAngle = 90f; // Угол обзора башни
+    public float ViewAngle = 90f;       // Угол обзора башни
     [Range(1,50)]
-    public float dampingRotation = 5f; // Скорость поворота
-
-    public LayerMask targetsMask; // Возможные цели
-    public LayerMask wallMask; // Стены через которые башня не видет
-
-    
-    public Transform currentTarget; // Цель для атаки на данный момент
-
-    ShootType shootType;
-    public List<Transform> visibleTargets = new List<Transform>();// Список всех в поле видимости
+    public float dampingRotation = 5f;  // Скорость поворота
+    public LayerMask targetsMask;       // Возможные цели
+    public LayerMask wallMask;          // Стены через которые башня не видет
+    public Transform currentTarget;     // Цель для атаки на данный момент
+    public List<Transform> visibleTargets = new List<Transform>(); // Список всех в поле видимости
+    ShootType shootType;                // Ссылка на скрипт в префабе
     #endregion
 
     // Поиск цели с в промежуток времени
