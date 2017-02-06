@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(ShootType),typeof(TargetSystem))]
+[RequireComponent(typeof(ShootType),typeof(TargetSystem), typeof(TowerAnimation))]
 public class TowerInformation : MonoBehaviour {
 
     public string Name;                 // Имя башни
@@ -23,7 +23,7 @@ public class TowerInformation : MonoBehaviour {
             return costForBuy/2 + lvlСoefficient * lvl;
         }
     }         
-    public Texture2D Icon;              // Иконка башни в Canvas
+    public Sprite Icon;              // Иконка башни в Canvas
 
 
 }

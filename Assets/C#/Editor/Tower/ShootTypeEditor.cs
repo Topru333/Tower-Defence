@@ -29,8 +29,8 @@ public class ShootTypeEditor : Editor {
     }
 
     void OnSceneGUI () {
-        foreach (ShootType.Attack a in myScript.Attacks) {
-            if (a.targetType == ShootType.Attack.TypeOfTargeting.ManyTargets && (a.attackType == ShootType.Attack.TypeOfAttack.Electric)) {
+        foreach (Attack a in myScript.Attacks) {
+            if (a.targetType == Attack.TypeOfTargeting.ManyTargets && (a.attackType == Attack.TypeOfAttack.Electric)) {
                 Handles.color = Color.yellow;
                 Handles.DrawWireArc(myScript.transform.position, Vector3.up, Vector3.forward, 360, a.disToNextTarget);
             }
@@ -61,7 +61,7 @@ public class ShootTypeEditor : Editor {
             EditorGUI.PropertyField(
                 new Rect(rect.x + 80, rect.y + 20 + r, rect.width - 90, EditorGUIUtility.singleLineHeight),
                 element.FindPropertyRelative("damage"), GUIContent.none);
-            if (myScript.Attacks[index].targetType == ShootType.Attack.TypeOfTargeting.ManyTargets && (myScript.Attacks[index].attackType == ShootType.Attack.TypeOfAttack.Electric)) {
+            if (myScript.Attacks[index].targetType == Attack.TypeOfTargeting.ManyTargets && (myScript.Attacks[index].attackType == Attack.TypeOfAttack.Electric)) {
                 EditorGUI.LabelField(new Rect(rect.x, rect.y + 40 + r, 60, EditorGUIUtility.singleLineHeight), "Count:");
                 EditorGUI.PropertyField(
                     new Rect(rect.x + 80, rect.y + 40 + r, rect.width - 90, EditorGUIUtility.singleLineHeight),
@@ -76,19 +76,19 @@ public class ShootTypeEditor : Editor {
                 new Rect(rect.x, rect.y + 40 + r, rect.width / 2 - 10, EditorGUIUtility.singleLineHeight),
                 element.FindPropertyRelative("targetType"), GUIContent.none);
             switch (myScript.Attacks[index].attackType) {
-                case ShootType.Attack.TypeOfAttack.Fire:
+                case Attack.TypeOfAttack.Fire:
                     GUI.color = Color.red;
                     break;
-                case ShootType.Attack.TypeOfAttack.Poison:
+                case Attack.TypeOfAttack.Poison:
                     GUI.color = Color.green;
                     break;
-                case ShootType.Attack.TypeOfAttack.Electric:
+                case Attack.TypeOfAttack.Electric:
                     GUI.color = Color.yellow;
                     break;
-                case ShootType.Attack.TypeOfAttack.Ice:
+                case Attack.TypeOfAttack.Ice:
                     GUI.color = Color.cyan;
                     break;
-                case ShootType.Attack.TypeOfAttack.Physics:
+                case Attack.TypeOfAttack.Physics:
                     GUI.color = Color.gray;
                     break;
             }
@@ -104,15 +104,7 @@ public class ShootTypeEditor : Editor {
             myScript.Attacks[index].effectsDisplayTime = GUI.HorizontalSlider(
                 new Rect(rect.x + 90, rect.y + 80 + r, rect.width - 100, EditorGUIUtility.singleLineHeight),
                 myScript.Attacks[index].effectsDisplayTime, 0.1f, 1f);
-            EditorGUI.LabelField(new Rect(rect.x, rect.y + 100 + r, 100, EditorGUIUtility.singleLineHeight), "Random points:");
-            myScript.Attacks[index].randomPointsCount = EditorGUI.IntSlider(
-                new Rect(rect.x + 90, rect.y + 100 + r, rect.width - 105, EditorGUIUtility.singleLineHeight),
-                myScript.Attacks[index].randomPointsCount, 2, 10);
-            EditorGUI.LabelField(new Rect(rect.x, rect.y + 120 + r, 80, EditorGUIUtility.singleLineHeight), "Gun point:");
-            EditorGUI.PropertyField(
-                new Rect(rect.x + 90, rect.y + 120 + r, rect.width - 105, EditorGUIUtility.singleLineHeight),
-                element.FindPropertyRelative("gunPoint"), GUIContent.none);         
-            list.elementHeight = 160 + r;
+            list.elementHeight = 120 + r;
         };
     }
 }

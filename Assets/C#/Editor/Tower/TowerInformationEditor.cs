@@ -17,7 +17,7 @@ public class TowerInformationEditor : Editor {
         serializedObject.Update();
         EditorGUILayout.HelpBox("Here will be full information about tower.", MessageType.None, true);
         GUILayout.Space(10);
-        myScript.Icon = (Texture2D)EditorGUILayout.ObjectField("Tower icon :", myScript.Icon, typeof(Texture2D), false);
+        myScript.Icon = (Sprite)EditorGUILayout.ObjectField("Tower icon :", myScript.Icon, typeof(Sprite), false);
         GUILayout.Space(10);
         myScript.Name = EditorGUILayout.TextField("Name: ", myScript.Name);
         EditorGUILayout.PropertyField(serializedObject.FindProperty("costForBuy"));

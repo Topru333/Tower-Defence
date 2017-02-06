@@ -43,7 +43,7 @@ public class TargetSystem : MonoBehaviour {
     void FixedUpdate () {
         if (currentTarget != null) {
             RotationTo(currentTarget); // Поворот верхушки к цели
-            foreach (ShootType.Attack a in shootType.Attacks) {
+            foreach (Attack a in shootType.Attacks) {
                 a.Shoot(visibleTargets, currentTarget);
             }
 
