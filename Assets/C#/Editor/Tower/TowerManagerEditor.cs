@@ -30,7 +30,7 @@ public class TowerManagerEditor : Editor {
         
         EditorGUILayout.HelpBox("This script for work with towers in scene. First list - towers that u can use in scene. Second list - towers that right now in scene.", MessageType.None, true);
         GUILayout.Space(10);
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("towerTypes"),true);
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("towerStore"),true);
         GUILayout.Space(10);
         EditorGUILayout.LabelField("In scene " + list.count + " towers");
         list.DoLayoutList();
