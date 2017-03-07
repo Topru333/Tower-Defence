@@ -14,7 +14,7 @@ public class PathSystem : MonoBehaviour {
     /// </summary>
     /// <param name="id">айди точки на входе ребра</param>
     /// <returns>айди точки на выходе ребра</returns>
-    private Point PointSearch (int id) {
+    public Point PointSearch (int id) {
         List<Edge> found = new List<Edge>();                                        //список ребер что были найдены
         int thisone = -1;
 
@@ -31,7 +31,7 @@ public class PathSystem : MonoBehaviour {
         for (int i = 0; i < Points.Count; i++) {
             if (Points[i].ID == thisone) return Points[i];                          // возвращаем следующую точку
         }
-        return new Point(0,new Vector2(0,0));                                       // если не найдена возвращаем нуливую позицию
+        return null;                                                                // если не найдена возвращаем нулл
     }
 
 }
@@ -58,7 +58,7 @@ public struct Edge {
 }
 
                                                                                       //Структура точки с переменными: айди точки и ее позиция(двухмерная так как весь путь у нас по сути на одной высоте
-public struct Point {
+public class Point {
     private int id;
     private Vector2 pos;
 
