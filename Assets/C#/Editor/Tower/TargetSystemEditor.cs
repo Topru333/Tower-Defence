@@ -57,7 +57,7 @@ public class TargetSystemEditor : Editor {
     public override void OnInspectorGUI () {
 
         serializedObject.Update();
-        EditorGUILayout.HelpBox("This script created for rotate tower and get a target. Choice system of rotating a bit down.", MessageType.None, true);
+        EditorGUILayout.HelpBox("This script created for rotate tower and search a target. Choice system of rotating a bit down.", MessageType.None, true);
         
         EditorGUILayout.PropertyField(rotate);
         EditorGUI.BeginDisabledGroup(myScript.Rotate == false);

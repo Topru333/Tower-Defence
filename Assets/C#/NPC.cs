@@ -10,7 +10,8 @@ public class NPC : MonoBehaviour {
     float Speed             = 1;   // Скорость передвижения NPC 
     float Radius            = 2;   // Радиус NPC
 
-    Object CurrentMovementEdge = null; // Ребро по которому движется NPC
+    Edge    CurrentMovementEdge = null; // Ребро по которому движется NPC
+    Vector2 CurrentMovementDir = Vector2.zero;
     public Texture2D Icon;
 
     // Инициализирует основные характеристики NPC
@@ -35,7 +36,7 @@ public class NPC : MonoBehaviour {
     void Move()
     {
         // TODO: Реализация.
-        if (!CurrentMovementEdge)
+        if (CurrentMovementEdge==null)
         {
             // TODO: Уменьшать жизни главной башни.
         }
