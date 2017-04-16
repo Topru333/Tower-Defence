@@ -10,39 +10,58 @@ public class PathSystem : MonoBehaviour {
 
     private float Radius = 2;                                                       // Радиус отрисованной точки
 
-    private static System.Random rand = new System.Random();
+    private  System.Random rand = new System.Random();
 
-    private static List<Point> points = new List<Point>();                          // Список имеющихся точек
-    private static List<Edge> edges = new List<Edge>();                             // Список имеющихся ребер
+    private  List<Point> points = new List<Point>();                          // Список имеющихся точек
+    private  List<Edge> edges = new List<Edge>();                             // Список имеющихся ребер
 
-    public static List<Point> Points {
+    public  List<Point> Points {
         get {
             return points;
         }
     }
-    public static List<Edge> Edges {
+    public  List<Edge> Edges {
         get {
             return edges;
         }
     }
-    private float timer,delay;
+
 
     /// <summary>
     /// Функция вызова волны NPC
     /// </summary>
     /// <param name="wave">структура волны(все данный о волне в ней)</param>
     /// <param name="id">Индекс вершины старта волны</param>
-    static void NPCSpawn (NpcWave wave,int id) {
+    public  void NPCSpawn (NpcWave wave) {
         Vector2 currentPos = Vector2.zero;
         for (int i = 0; i <Points.Count; i++) {
-            if (Points[i].ID == id) {
+            if (Points[i].ID == Start_id) {
                 currentPos = Points[i].Position;
             }
         }
         if (currentPos.Equals(Vector2.zero)){
             return;
         }
-        Instantiate(wave.NPC, currentPos, Quaternion.identity);
+        npc = wave.NPC;
+        pos = currentPos;
+        count = wave.count;
+        StartCoroutine("WaveMob",wave.delay);
+        
+    }
+
+    private GameObject npc;
+    private Vector3 pos;
+    private int count;
+
+    IEnumerator WaveMob (float delay) {
+        while (true) {
+            yield return new WaitForSeconds(delay);
+            Instantiate(npc, pos, Quaternion.identity);
+            count--;
+            if (count <= 0) {
+                StopCoroutine("WaveMob");
+            }
+        }
     }
 
     void Awake () {
@@ -50,11 +69,11 @@ public class PathSystem : MonoBehaviour {
         instance = this;
     }
     void Update () {
-        timer += Time.deltaTime;
+
     }
 
 
-    public static Edge GetNextEdge (int id_in) {
+    public  Edge GetNextEdge (int id_in) {
         for(int i = 0; i < edges.Count - 1; i++) {
             if(edges[i].ID_in == id_in) {
                 return edges[i];
@@ -69,7 +88,7 @@ public class PathSystem : MonoBehaviour {
     /// </summary>
     /// <param name="id">айди точки на входе ребра</param>
     /// <returns>айди точки на выходе ребра</returns>
-    public static Point NextPointSearch (int id) {
+    public  Point NextPointSearch (int id) {
         List<Edge> found = new List<Edge>();                                        //список ребер что были найдены
         int thisone = -1;
 
@@ -96,7 +115,7 @@ public class PathSystem : MonoBehaviour {
         }
     }
 
-    public static void Init () {
+    public void Init () {
         /* Заполняем списки вершин и ребер в ручную (Points, Edges)+ unit test */
         /* В векторе пишем X и Z, это примеры */
         points.Add(new Point(0, new Vector2(1, 8)));
@@ -131,19 +150,19 @@ public class Edge {
     }
 
     #region Получение точки из ребра
-    public Vector2 GetPointIn () {
-        for(int i = 0;i < PathSystem.Points.Count; i++) {
-            if(PathSystem.Points[i].ID == id_in) {
-                return PathSystem.Points[i].Position;
+    public Vector2 GetPointIn (List<Point> points) {
+        for(int i = 0;i < points.Count; i++) {
+            if(points[i].ID == id_in) {
+                return points[i].Position;
             }
         }
         return Vector2.zero; // Если не найдет вернет нулевой вектор!
     }
 
-    public Vector2 GetPointOut () {
-        for (int i = 0; i < PathSystem.Points.Count; i++) {
-            if (PathSystem.Points[i].ID == id_out) {
-                return PathSystem.Points[i].Position;
+    public Vector2 GetPointOut (List<Point> points) {
+        for (int i = 0; i < points.Count; i++) {
+            if (points[i].ID == id_out) {
+                return points[i].Position;
             }
         }
         return Vector2.zero; // Если не найдет вернет нулевой вектор!
@@ -173,9 +192,4 @@ public class Point {
     }
 }
 
-public struct NpcWave {
-    public GameObject NPC;
-    public int count;
-    public int delay;
-    public int reward;
-}
+
