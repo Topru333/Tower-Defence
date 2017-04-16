@@ -12,9 +12,19 @@ public class PathSystem : MonoBehaviour {
 
     private static System.Random rand = new System.Random();
 
-    private static List<Point> Points = new List<Point>();                          // Список имеющихся точек
-    private static List<Edge> Edges = new List<Edge>();                             // Список имеющихся ребер
+    private static List<Point> points = new List<Point>();                          // Список имеющихся точек
+    private static List<Edge> edges = new List<Edge>();                             // Список имеющихся ребер
 
+    public static List<Point> Points {
+        get {
+            return points;
+        }
+    }
+    public static List<Edge> Edges {
+        get {
+            return edges;
+        }
+    }
     private float timer,delay;
 
     /// <summary>
@@ -23,8 +33,18 @@ public class PathSystem : MonoBehaviour {
     /// <param name="wave">структура волны(все данный о волне в ней)</param>
     /// <param name="id">Индекс вершины старта волны</param>
     static void NPCSpawn (NpcWave wave,int id) {
-        //todo: Спавнит мобов в вершине...
+        Vector2 currentPos = Vector2.zero;
+        for (int i = 0; i <Points.Count; i++) {
+            if (Points[i].ID == id) {
+                currentPos = Points[i].Position;
+            }
+        }
+        if (currentPos.Equals(Vector2.zero)){
+            return;
+        }
+        Instantiate(wave.NPC, currentPos, Quaternion.identity);
     }
+
     void Awake () {
         if (instance != null) { Debug.LogError("More than 1 Path system on the level"); return; }
         instance = this;
@@ -33,18 +53,29 @@ public class PathSystem : MonoBehaviour {
         timer += Time.deltaTime;
     }
 
+
+    public static Edge GetNextEdge (int id_in) {
+        for(int i = 0; i < edges.Count - 1; i++) {
+            if(edges[i].ID_in == id_in) {
+                return edges[i];
+            }
+        }
+        return null;
+    }
+
+    
     /// <summary>
     /// Поиск следующей точки по айди
     /// </summary>
     /// <param name="id">айди точки на входе ребра</param>
     /// <returns>айди точки на выходе ребра</returns>
-    public static Point PointSearch (int id) {
+    public static Point NextPointSearch (int id) {
         List<Edge> found = new List<Edge>();                                        //список ребер что были найдены
         int thisone = -1;
 
-        for (int i = 0; i < Edges.Count; i++) {
-            if (Edges[i].ID_in == id) {
-                found.Add(Edges[i]);                                                //заполняем список
+        for (int i = 0; i < edges.Count; i++) {
+            if (edges[i].ID_in == id) {
+                found.Add(edges[i]);                                                //заполняем список
             }
         }
         
@@ -52,35 +83,35 @@ public class PathSystem : MonoBehaviour {
             { thisone = found[rand.Next(0,found.Count-1)].ID_out; }                 // берем рандомный из них
         else if(found.Count == 1) { thisone = found[0].ID_out; }                    // берем тот единственный что есть
 
-        for (int i = 0; i < Points.Count; i++) {
-            if (Points[i].ID == thisone) return Points[i];                          // возвращаем следующую точку
+        for (int i = 0; i < points.Count; i++) {
+            if (points[i].ID == thisone) return points[i];                          // возвращаем следующую точку
         }
         return null;                                                                // если не найдена возвращаем нулл
     }
 
     public void OnDrawGizmos () {
         Gizmos.color = new Color(Color.cyan.r, Color.cyan.g, Color.cyan.b, 0.5f);
-        for (int i = 0; i < Points.Count; i++) {
-            Gizmos.DrawSphere(Points[i].Position, Radius);
+        for (int i = 0; i < points.Count; i++) {
+            Gizmos.DrawSphere(points[i].Position, Radius);
         }
     }
 
     public static void Init () {
         /* Заполняем списки вершин и ребер в ручную (Points, Edges)+ unit test */
         /* В векторе пишем X и Z, это примеры */
-        Points.Add(new Point(0, new Vector2(1, 8)));
-        Points.Add(new Point(1, new Vector2(4, 8)));
+        points.Add(new Point(0, new Vector2(1, 8)));
+        points.Add(new Point(1, new Vector2(4, 8)));
 
-        Edges.Add(new Edge(0,1));
+        edges.Add(new Edge(0,1));
 
-        Points.Add(new Point(2, new Vector2(4, 6)));
+        points.Add(new Point(2, new Vector2(4, 6)));
 
-        Edges.Add(new Edge(1, 2));
+        edges.Add(new Edge(1, 2));
     }
 }
 
                                                                                     //Струкутра для ребра с переменными:айди начала и айди выхода точки
-public struct Edge {
+public class Edge {
     private int id_in,id_out;
 
     public int ID_in {
@@ -98,9 +129,29 @@ public struct Edge {
         id_in = i;
         id_out = j;
     }
+
+    #region Получение точки из ребра
+    public Vector2 GetPointIn () {
+        for(int i = 0;i < PathSystem.Points.Count; i++) {
+            if(PathSystem.Points[i].ID == id_in) {
+                return PathSystem.Points[i].Position;
+            }
+        }
+        return Vector2.zero; // Если не найдет вернет нулевой вектор!
+    }
+
+    public Vector2 GetPointOut () {
+        for (int i = 0; i < PathSystem.Points.Count; i++) {
+            if (PathSystem.Points[i].ID == id_out) {
+                return PathSystem.Points[i].Position;
+            }
+        }
+        return Vector2.zero; // Если не найдет вернет нулевой вектор!
+    }
+    #endregion
 }
 
-                                                                                      //Структура точки с переменными: айди точки и ее позиция(двухмерная так как весь путь у нас по сути на одной высоте
+//Структура точки с переменными: айди точки и ее позиция(двухмерная так как весь путь у нас по сути на одной высоте
 public class Point {
     private int id;
     private Vector2 pos;
@@ -110,7 +161,7 @@ public class Point {
             return id;
         }
     }
-    public Vector3 Position {
+    public Vector2 Position {
         get {
             return pos;
         }
@@ -123,4 +174,8 @@ public class Point {
 }
 
 public struct NpcWave {
+    public GameObject NPC;
+    public int count;
+    public int delay;
+    public int reward;
 }

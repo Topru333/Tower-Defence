@@ -90,6 +90,7 @@ public class NPCSpawnPointEditor : Editor
     }
     public override void OnInspectorGUI()
     {
+        DrawDefaultInspector();
         serializedObject.Update();
         list.DoLayoutList();
         serializedObject.ApplyModifiedProperties();

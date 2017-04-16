@@ -24,7 +24,10 @@ public class ShootType : MonoBehaviour {
         }
     }
 }
+public class TowerAnimation
+{
 
+}
 [Serializable]
 public class Attack {
     public enum TypeOfTargeting {        // Способы прицеливания
@@ -64,12 +67,12 @@ public class Attack {
 
     public void DisableEffects () {
         // Стирание эффета
-        ta.StopAnimation();
+        //ta.StopAnimation();
     }
     
     public void OnStart (Transform tower) {
         ta = tower.gameObject.GetComponent<TowerAnimation>();
-        ta.OnStart(attackType);
+        //ta.OnStart(attackType);
     }
     public void Shoot (List<Transform> targets, Transform currentTarget) {
         if (timer >= bulletsDelay && Time.timeScale != 0) {
@@ -82,7 +85,7 @@ public class Attack {
                             break;
                         }
                     case TypeOfAttack.Fire: {
-                            ta.StartAnimation();
+                           // ta.StartAnimation();
 
                             break;
                         }
@@ -114,13 +117,13 @@ public class Attack {
     /// </summary>
     /// <param name="target">Цель удара</param>
     private void HitElectric (List<Transform> targets, Transform currentTarget) {
-        ta.StartAnimation(currentTarget,targets);
+       // ta.StartAnimation(currentTarget,targets);
     }
     private void HitSinglePhysics (Transform target) {
-        ta.StartAnimation(target);
+        //ta.StartAnimation(target);
     }
     private void HitFreeze (List<Transform> targets) {
-        ta.StartAnimation();
+        //ta.StartAnimation();
     }
     #endregion
 
