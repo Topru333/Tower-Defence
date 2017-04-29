@@ -25,7 +25,7 @@ public class LevelManager : MonoBehaviour {
     // Метод вызова волн
     public void WaveStart () {
         NpcWave NpcWave = waves.Pop();
-        PathSystem.instance.NPCSpawn(NpcWave);
+        PathSystem.Instance.NPCSpawn(NpcWave,0);
     }
 
     // Изменение скорости игры
@@ -34,11 +34,7 @@ public class LevelManager : MonoBehaviour {
     }
     // Переход в режим "пауза"(и обратно)
     public void Pause () {
-        if (pause) {
-            pause = false;
-        }
-        else pause = true;
-
+        pause = !pause;
     }
 
     // Метод завершения уровня

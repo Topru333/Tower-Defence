@@ -3,7 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PathSystem : MonoBehaviour {
-    public static PathSystem instance;
+    private static PathSystem _instance;
+    public static PathSystem Instance {
+        get
+        {
+            if(_instance == null)
+            {
+                GameObject singleton = new GameObject();
+                _instance = singleton.AddComponent<PathSystem>();
+                singleton.name = typeof(PathSystem).ToString();
+            }
+            return _instance;
+        }
+    }
 
     public int Start_id;                                                            // Айди стартовой точки для спавна нпс
 
@@ -26,16 +38,23 @@ public class PathSystem : MonoBehaviour {
         }
     }
 
+    public void Load(List<Point> _points, List<Edge> _edges)
+    {
+        if (_points == null || _edges == null)
+            Debug.LogError("PathSystem.Load:Переданы пустые параметры");
+        points = _points;
+        edges = _edges;
+    }
 
     /// <summary>
     /// Функция вызова волны NPC
     /// </summary>
     /// <param name="wave">структура волны(все данный о волне в ней)</param>
     /// <param name="id">Индекс вершины старта волны</param>
-    public  void NPCSpawn (NpcWave wave) {
+    public void NPCSpawn (NpcWave wave, int id) {
         Vector2 currentPos = Vector2.zero;
         for (int i = 0; i <Points.Count; i++) {
-            if (Points[i].ID == Start_id) {
+            if (Points[i].ID == id) {
                 currentPos = Points[i].Position;
             }
         }
@@ -46,7 +65,6 @@ public class PathSystem : MonoBehaviour {
         pos = currentPos;
         count = wave.count;
         StartCoroutine("WaveMob",wave.delay);
-        
     }
 
     private GameObject npc;
@@ -65,19 +83,19 @@ public class PathSystem : MonoBehaviour {
     }
 
     void Awake () {
-        if (instance != null) { Debug.LogError("More than 1 Path system on the level"); return; }
-        instance = this;
+
     }
     void Update () {
 
     }
 
-
-    public  Edge GetNextEdge (int id_in) {
-        for(int i = 0; i < edges.Count - 1; i++) {
-            if(edges[i].ID_in == id_in) {
-                return edges[i];
-            }
+    // Возвращает следующее ребро
+    public  Edge GetNextEdge (Edge lastEdge) {
+        var foundEdges = edges.FindAll((Edge a) => { return a.ID_in == lastEdge.ID_out; });
+        if (foundEdges != null)
+        {
+            int edgeID = Random.Range(0, foundEdges.Count);
+            return foundEdges[edgeID];
         }
         return null;
     }

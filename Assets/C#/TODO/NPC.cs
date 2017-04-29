@@ -35,10 +35,17 @@ public class NPC : MonoBehaviour {
     // Перемещает персонажа по текущему ребру
     void Move()
     {
-        // TODO: Реализация.
-        if (CurrentMovementEdge==null)
+        var pathSystem = PathSystem.Instance;
+        var points = pathSystem.Points;
+
+        if (CurrentMovementEdge == null)
         {
             // TODO: Уменьшать жизни главной башни.
+        }
+        else
+        {
+            CurrentMovementEdge = pathSystem.GetNextEdge(CurrentMovementEdge);
+            transform.Translate(points[CurrentMovementEdge.ID_out].Position - points[CurrentMovementEdge.ID_in].Position);
         }
     }
 
@@ -55,7 +62,14 @@ public class NPC : MonoBehaviour {
     void Death()
     {
         Debug.Log(string.Format("Отладка:{0}: NPC умер.", name));
+
         // TODO: Повышать опыт игрока.
+    }
+
+    // Меняет текущюю дугу движения.
+    public void SetMovementEdge(Edge edge)
+    {
+        CurrentMovementEdge = edge;
     }
 
 }
