@@ -59,7 +59,7 @@ public class NPC : MonoBehaviour {
     }
 
     // Наносит урон персонажу.
-    void DoDamage(int damagePoints)
+    public void DoDamage(int damagePoints)
     {
         if (damagePoints <= 0)
             throw new System.ArgumentOutOfRangeException();

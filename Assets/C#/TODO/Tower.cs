@@ -8,27 +8,27 @@ public class Tower : MonoBehaviour {
 
     UpgradableParams upgradableParameters; // Список улучшаемых параметров
     List<Transform> targetList;            // Список целей
-    Transform currentTarget;     // Цель для атаки на данный момент
 
     uint upgradeLevel,          // Уровень башни
          maxUpgradeLevel;       // Максимальный уровень башни
 
     float baseUpgradePrice,     // Начальная стоимость повышения уровня
           priceIncreasePercent, // Процент изменения стоимости повышения уровня
-          targetListUpdateFreq, // Частота обновления списка целей
+          timer,                // Для проверки частоты удара
           basePrice,            // Цена продажи
           sellPrice;            // Цена покупки
     Texture2D icon;
 
     void FixedUpdate () {
-        if (currentTarget != null) {
-            
+        if(timer >= upgradableParameters.TargetDamageFrequency) {
+            timer = 0f;
+            TargetDamage();
         }
     }
 
     // Инициализация
     void Awake () {
-        StartCoroutine("FindTargetsWithDelay", .2f);
+        StartCoroutine("FindTargetsWithDelay", upgradableParameters.targetListUpdateFreq);
     }
 
     // Обновление
@@ -36,17 +36,12 @@ public class Tower : MonoBehaviour {
 		
 	}
 
-    // Функция поиска ближайшей цели
-    Collider FindClosest (Collider[] targets, Transform from) { 
-        Vector3 position = from.position;
-        return targets.OrderBy(o => (o.transform.position - position).sqrMagnitude).FirstOrDefault();
-    }
-
     // Поиск цели с в промежуток времени
     IEnumerator FindTargetsWithDelay (float delay) {
         while (true) {
             yield return new WaitForSeconds(delay);
             TargetSearch();
+            timer += delay;
         }
     }
 
@@ -54,10 +49,8 @@ public class Tower : MonoBehaviour {
     void TargetSearch()
     {
         targetList.Clear();
-        currentTarget = null; // Очистка предыдущих при каждом поиске
         Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, upgradableParameters.TargetSearchRadius, upgradableParameters.targetsMask); // Проверка присутствия целей в радиусе
         if (targetsInViewRadius.Length > 0) {
-            currentTarget = FindClosest(targetsInViewRadius, transform).transform;
             for (int i = 0; i < targetsInViewRadius.Length; i++) {
                 Transform target = targetsInViewRadius[i].transform;
                 Vector3 dirToTarget = (target.position - transform.position).normalized;
@@ -70,18 +63,25 @@ public class Tower : MonoBehaviour {
                 }
             }
         }
+        targetList.OrderBy(target => transform.position-target.position); //Сортировка по дальности
     }
 
     // Нанесение урона
     void TargetDamage()
     {
-
+        for(int i = 0; i < upgradableParameters.MaxTargetCount && i < targetList.Count; i++) {
+            NPC npc = targetList[i].gameObject.GetComponent<NPC>();
+            npc.DoDamage(upgradableParameters.TowerDamage);
+        }
     }
 
     // Повышение уровня
     public void Upgrade()
     {
-
+        upgradeLevel++;
+        upgradableParameters.TowerDamage *= 2;
+        upgradableParameters.TargetSearchRadius *= 1.3f;
+        upgradableParameters.TargetDamageFrequency *= 1.1f;
     }
 
     // Обработчик инициализации классов наследников
@@ -91,8 +91,7 @@ public class Tower : MonoBehaviour {
     }
 
     // Визуализация спецэффектов
-    public virtual void DrawEffects()
-    {
+    public virtual void DrawEffects () {
 
     }
 
@@ -118,7 +117,9 @@ public class UpgradableParams
 {
     public LayerMask targetsMask,       // Возможные цели
                      wallMask;          // Стены через которые башня не видет
-    public float TargetSearchRadius,    // Радиус поиска целей
-                 TargetDamageFrequency; // Частота нанесения урона по целям
-    public int   MaxTargetCount;        // Максимальное количество целей
+    public float     TargetSearchRadius,    // Радиус поиска целей
+                     TargetDamageFrequency, // Частота нанесения урона по целям
+                     targetListUpdateFreq;  // Частота обновления списка целей
+    public int       MaxTargetCount,        // Максимальное количество целей
+                     TowerDamage;
 }
