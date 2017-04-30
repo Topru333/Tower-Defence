@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class PathSystem : MonoBehaviour {
     private static PathSystem _instance;
@@ -40,8 +41,12 @@ public class PathSystem : MonoBehaviour {
 
     public void Load(List<Point> _points, List<Edge> _edges)
     {
+#if DEBUG
         if (_points == null || _edges == null)
-            Debug.LogError("PathSystem.Load:Переданы пустые параметры");
+            throw new ArgumentNullException("_points,_edges","PathSystem.Load: параметры к методу пустые.");
+        if (_points.Count<2 || _edges.Count<1)
+            throw new ArgumentOutOfRangeException("_points.Count,_edges.Count", "PathSystem.Load: параметры имеют слишком маленькое количество элементов.");
+#endif
         points = _points;
         edges = _edges;
     }
@@ -94,7 +99,7 @@ public class PathSystem : MonoBehaviour {
         var foundEdges = edges.FindAll((Edge a) => { return a.ID_in == lastEdge.ID_out; });
         if (foundEdges != null)
         {
-            int edgeID = Random.Range(0, foundEdges.Count);
+            int edgeID = UnityEngine.Random.Range(0, foundEdges.Count);
             return foundEdges[edgeID];
         }
         return null;
@@ -132,22 +137,9 @@ public class PathSystem : MonoBehaviour {
             Gizmos.DrawSphere(points[i].Position, Radius);
         }
     }
-
-    public void Init () {
-        /* Заполняем списки вершин и ребер в ручную (Points, Edges)+ unit test */
-        /* В векторе пишем X и Z, это примеры */
-        points.Add(new Point(0, new Vector2(1, 8)));
-        points.Add(new Point(1, new Vector2(4, 8)));
-
-        edges.Add(new Edge(0,1));
-
-        points.Add(new Point(2, new Vector2(4, 6)));
-
-        edges.Add(new Edge(1, 2));
-    }
 }
 
-                                                                                    //Струкутра для ребра с переменными:айди начала и айди выхода точки
+//Струкутра для ребра с переменными:айди начала и айди выхода точки
 public class Edge {
     private int id_in,id_out;
 
