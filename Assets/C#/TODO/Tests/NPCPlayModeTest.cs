@@ -119,7 +119,7 @@ public class NPCPlayModeTest {
             ps.NPCSpawn(wave, -1);
         }, "Метод NPCSpawn(wave,id) пропустил некорректный параметр id");
 
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
+        Assert.DoesNotThrow(() =>
         {
             PathSystem_testLoadMethod(ps);
 
@@ -129,7 +129,7 @@ public class NPCPlayModeTest {
             wave.NPC = new GameObject("TestNPC");
             wave.reward = 100;
             ps.NPCSpawn(wave, 4);
-        }, "Метод NPCSpawn(wave,id) пропустил некорректный параметр id");
+        }, "Метод NPCSpawn(wave,id) вылетел с ошибкой");
     }
 
     private static void PathSystem_LoadMethodTest(PathSystem ps)
@@ -149,7 +149,7 @@ public class NPCPlayModeTest {
         }, "Метод Load(points,edges) выбросил исключение");
     }
 
-    private static void PathSystem_testLoadMethod(PathSystem ps)
+    public static void PathSystem_testLoadMethod(PathSystem ps)
     {
         List<Point> pointList;
         List<Edge> edgeList;
@@ -162,13 +162,13 @@ public class NPCPlayModeTest {
     {
         pointList = new List<Point>();
         edgeList = new List<Edge>();
-        pointList.Add(new Point(0, new Vector2(1, 8)));
-        pointList.Add(new Point(1, new Vector2(4, 8)));
-
-        edgeList.Add(new Edge(0, 1));
-
-        pointList.Add(new Point(2, new Vector2(4, 6)));
+        pointList.Add(new Point(1, new Vector2(10, 80)));
+        pointList.Add(new Point(2, new Vector2(40, 80)));
 
         edgeList.Add(new Edge(1, 2));
+
+        pointList.Add(new Point(3, new Vector2(40, 60)));
+
+        edgeList.Add(new Edge(2, 3));
     }
 }
