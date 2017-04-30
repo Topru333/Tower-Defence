@@ -119,7 +119,7 @@ public class NPCPlayModeTest {
             ps.NPCSpawn(wave, -1);
         }, "Метод NPCSpawn(wave,id) пропустил некорректный параметр id");
 
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
+        Assert.DoesNotThrow(() =>
         {
             PathSystem_testLoadMethod(ps);
 
