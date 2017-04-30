@@ -7,7 +7,7 @@ public class NPC : MonoBehaviour {
     int PlayerExperience    = 10;  // Опыт получаемый игроком при смерти NPC
     int MainTowerDamage     = 10;  // Урон, который NPC наносит главной башне по достижении конца пути
 
-    float Speed             = 1;   // Скорость передвижения NPC 
+    float Speed             = 5;   // Скорость передвижения NPC 
     float Radius            = 2;   // Радиус NPC
 
     Edge    CurrentMovementEdge = null; // Ребро по которому движется NPC
@@ -27,7 +27,7 @@ public class NPC : MonoBehaviour {
     // Отрисовка информации для редактора.
     public virtual void OnDrawGizmos()
     {
-        Gizmos.color = new Color( Color.cyan.r,Color.cyan.g,Color.cyan.b,0.5f);
+        Gizmos.color = new Color( Color.red.r,Color.red.g,Color.red.b,0.5f);
         Gizmos.DrawSphere(transform.position, Radius);
        // Gizmos.DrawIcon(transform.position,)
     }
@@ -38,20 +38,31 @@ public class NPC : MonoBehaviour {
         var pathSystem = PathSystem.Instance;
         var points = pathSystem.Points;
 
+
         if (CurrentMovementEdge == null)
         {
-            // TODO: Уменьшать жизни главной башни.
+            LevelManager.Instance.mainTowerLifeCount -= MainTowerDamage;
+            Destroy(this);
         }
         else
         {
-            CurrentMovementEdge = pathSystem.GetNextEdge(CurrentMovementEdge);
-            transform.Translate(points[CurrentMovementEdge.ID_out].Position - points[CurrentMovementEdge.ID_in].Position);
+            if (CurrentMovementEdge != null)
+            {
+                Vector3 outPoint = points[CurrentMovementEdge.ID_out - 1].Position;
+                outPoint.z = outPoint.y;
+                outPoint.y = 0;
+                if (Vector3.Distance(transform.position, outPoint) - Radius * 0.4f < 0)
+                    CurrentMovementEdge = pathSystem.GetNextEdge(CurrentMovementEdge);
+                transform.Translate((outPoint - transform.position).normalized * Time.deltaTime * Speed);
+            }
         }
     }
 
     // Наносит урон персонажу.
     void DoDamage(int damagePoints)
     {
+        if (damagePoints <= 0)
+            throw new System.ArgumentOutOfRangeException();
         Health -= damagePoints;
         Debug.Log(string.Format("Отладка:{0}: NPC нанесен урон - {1}, значение жизней - {2}.", name, damagePoints, Health));
         if (Health <= 0)
@@ -62,8 +73,7 @@ public class NPC : MonoBehaviour {
     void Death()
     {
         Debug.Log(string.Format("Отладка:{0}: NPC умер.", name));
-
-        // TODO: Повышать опыт игрока.
+        LevelManager.Instance.pointsOnLvl += PlayerExperience;
     }
 
     // Меняет текущюю дугу движения.
