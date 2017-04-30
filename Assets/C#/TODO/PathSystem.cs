@@ -21,7 +21,7 @@ public class PathSystem : MonoBehaviour {
     public int Start_id;                                                            // Айди стартовой точки для спавна нпс
 
 
-    private float Radius = 2;                                                       // Радиус отрисованной точки
+    private float Radius = 0.5f;                                                       // Радиус отрисованной точки
 
     private  System.Random rand = new System.Random();
 
@@ -57,34 +57,33 @@ public class PathSystem : MonoBehaviour {
     /// <param name="wave">структура волны(все данный о волне в ней)</param>
     /// <param name="id">Индекс вершины старта волны</param>
     public void NPCSpawn (NpcWave wave, int id) {
+#if DEBUG
         Debug.LogFormat("{0},{1},{2},{3}", wave.count, wave.delay, wave.reward,id);
         if (wave.NPC == null) throw new ArgumentNullException("NPCSpawn - wave isn't correct - null");
-        if ( wave.count <= 0 || wave.delay <= 0 || wave.reward <= 0 || id <= 0 ) throw new ArgumentOutOfRangeException("NPCSpawn - wave isn't correct");
-        Vector2 currentPos = Vector2.zero;
-        for (int i = 0; i <Points.Count; i++) {
-            if (Points[i].ID == id) {
-                currentPos = Points[i].Position;
-            }
+        if ( wave.count <= 0 || wave.delay <= 0 || wave.reward <= 0 || id <= 0|| id >= Points.Count) throw new ArgumentOutOfRangeException("NPCSpawn - wave isn't correct");
+#endif
+        var edgeList = Instance.Edges.FindAll((Edge e) => { return e.ID_in == id; });
+        if (edgeList!=null && edgeList.Count > 0)
+        {
+            int edgeID= UnityEngine.Random.Range(0, edgeList.Count);
+            Debug.Log(edgeList.Count);
+            StartCoroutine("WaveMob", new NPCWaveInstanceInfo { _edge = edgeList[edgeID], _wave = wave });
         }
-        if (currentPos.Equals(Vector2.zero)){
-            return;
-        }
-        npc = wave.NPC;
-        pos = currentPos;
-        count = wave.count;
-        StartCoroutine("WaveMob",wave.delay);
+    }
+    private class NPCWaveInstanceInfo
+    {
+        public Edge _edge;
+        public NpcWave _wave;
     }
 
-    private GameObject npc;
-    private Vector3 pos;
-    private int count;
-
-    IEnumerator WaveMob (float delay) {
+    IEnumerator WaveMob (NPCWaveInstanceInfo waveInfo) {
         while (true) {
-            yield return new WaitForSeconds(delay);
-            Instantiate(npc, pos, Quaternion.identity);
-            count--;
-            if (count <= 0) {
+            yield return new WaitForSeconds(waveInfo._wave.delay);
+            var instancePos = Points[waveInfo._edge.ID_in-1].Position;
+            var npc = Instantiate(waveInfo._wave.NPC, new Vector3(instancePos.x, 0, instancePos.y), Quaternion.identity);
+            npc.GetComponent<NPC>().SetMovementEdge(waveInfo._edge);
+            waveInfo._wave.count--;
+            if (waveInfo._wave.count <= 0) {
                 StopCoroutine("WaveMob");
             }
         }
@@ -99,10 +98,12 @@ public class PathSystem : MonoBehaviour {
 
     // Возвращает следующее ребро
     public  Edge GetNextEdge (Edge lastEdge) {
+#if DEBUG
         if (lastEdge == null) throw new ArgumentNullException("GetNewEdge - null");
         if (lastEdge.ID_in <= 0 || lastEdge.ID_out <= 0) throw new ArgumentOutOfRangeException("GetNewEdge - edge isn't correct");
+#endif
         var foundEdges = edges.FindAll((Edge a) => { return a.ID_in == lastEdge.ID_out; });
-        if (foundEdges != null)
+        if (foundEdges != null && foundEdges.Count > 0)
         {
             int edgeID = UnityEngine.Random.Range(0, foundEdges.Count);
             return foundEdges[edgeID];
@@ -116,8 +117,11 @@ public class PathSystem : MonoBehaviour {
     /// </summary>
     /// <param name="id">айди точки на входе ребра</param>
     /// <returns>айди точки на выходе ребра</returns>
-    public  Point NextPointSearch (int id) {
+    public  Point NextPointSearch (int id)
+    {
+#if DEBUG
         if (id <= 0) throw new ArgumentOutOfRangeException("NextPointSearch - id isn't correct");
+#endif
         List<Edge> found = new List<Edge>();                                        //список ребер что были найдены
         int thisone = -1;
 
@@ -140,7 +144,7 @@ public class PathSystem : MonoBehaviour {
     public void OnDrawGizmos () {
         Gizmos.color = new Color(Color.cyan.r, Color.cyan.g, Color.cyan.b, 0.5f);
         for (int i = 0; i < points.Count; i++) {
-            Gizmos.DrawSphere(points[i].Position, Radius);
+            Gizmos.DrawSphere(new Vector3( points[i].Position.x,0, points[i].Position.y), Radius);
         }
     }
 }

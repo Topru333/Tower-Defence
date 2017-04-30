@@ -31,6 +31,7 @@ public class LevelManager : MonoBehaviour {
     Stack<NpcWave> waves = new Stack<NpcWave>();                    // Стек списков волн
 
     private static void ReadBlock (TextReader tr, Action<string> readAction) {
+        tr.ReadLine();
         string line = tr.ReadLine();
         while (line != "end") {
             readAction(line);
@@ -39,15 +40,17 @@ public class LevelManager : MonoBehaviour {
     }
 
    
-
-    private void LoadPathGraph (string path) {
+    // Загружает данные о путях из файла
+    public void LoadPathGraph (string path) {
         List<Point> points = new List<Point>();
         List<Edge> edges = new List<Edge>();
         using (StreamReader sr = new StreamReader(path)) {
             ReadBlock(sr, (string _line) => {
                 string[] splitLine = _line.Split(' ');
-                int a1, a2, a3;
-                if (int.TryParse(splitLine[0], out a1) && int.TryParse(splitLine[1], out a2) && int.TryParse(splitLine[2], out a3)) {
+                int a1;
+                float a2, a3;
+                Debug.Log(splitLine[0] + " " + splitLine[1] + " " + splitLine[2] + " ");
+                if (int.TryParse(splitLine[0], out a1) && float.TryParse(splitLine[1], out a2) && float.TryParse(splitLine[2], out a3)) {
                     points.Add(new Point(a1, new Vector2(a2, a3)));
                 }
                 else {
