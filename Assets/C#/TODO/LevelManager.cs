@@ -7,11 +7,25 @@ using UnityEngine.TestTools;
 using NUnit.Framework;
 
 public class LevelManager : MonoBehaviour {
-     
+    private static LevelManager _instance;
+    public static LevelManager Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                GameObject singleton = new GameObject();
+                _instance = singleton.AddComponent<LevelManager>();
+                singleton.name = typeof(LevelManager).ToString();
+            }
+            return _instance;
+        }
+    }
+
     public List<GameObject> towerStore = new List<GameObject>();    // Список башен доступных для постройки
     public int pointsOnLvl = 100;                                   // Кол-во очков полученных на уровне
     public int coinsOnLvl = 100;                                    // Кол-во денег полученных на уровне
-    public int mainLifes = 10;                                      // Кол-во жизней у основной башни
+    public int mainTowerLifeCount = 10;                                      // Кол-во жизней у основной башни
     public bool pause = false;                                      // Состояние игры(pause - true/inGame - false)
     public float gameSpeed = 10f;                                   // Скорость игры
     Stack<NpcWave> waves = new Stack<NpcWave>();                    // Стек списков волн
