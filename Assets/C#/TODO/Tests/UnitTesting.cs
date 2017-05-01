@@ -4,8 +4,9 @@ using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using TD;
 
-public class NPCPlayModeTest {
+public class UnitTesting {
 
 	[Test]
 	public void PathSystemUnitTest()
@@ -30,6 +31,12 @@ public class NPCPlayModeTest {
 
     [Test]
     public void NPCUnitTest()
+    {
+
+    }
+
+    [Test]
+    public void TowerUnitTest()
     {
 
     }
