@@ -79,9 +79,6 @@ public class Tower : MonoBehaviour {
     public void Upgrade()
     {
         upgradeLevel++;
-        upgradableParameters.TowerDamage *= 2;
-        upgradableParameters.TargetSearchRadius *= 1.3f;
-        upgradableParameters.TargetDamageFrequency *= 1.1f;
     }
 
     // Обработчик инициализации классов наследников
