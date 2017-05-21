@@ -20,62 +20,52 @@ public class MainMenu : MonoBehaviour {
 
 
         float xy = (Screen.width / Screen.height * mainMenuScale);
-        RectTransform rt = mainMenuButtons[0].GetComponent(typeof(RectTransform)) as RectTransform;
-        rt.sizeDelta = new Vector2(xy, xy);
-        rt = mainMenuButtons[1].GetComponent(typeof(RectTransform)) as RectTransform;
-        rt.sizeDelta = new Vector2(xy, xy);
+        for(int i = 0; i < 2; i++)
+            SetRectSize(mainMenuButtons[i], xy, xy);
 
         xy = (Screen.width / Screen.height * levelMenuScale);
-        rt = LevelMenuButtons[0].GetComponent(typeof(RectTransform)) as RectTransform;
-        rt.sizeDelta = new Vector2(xy, xy);
-        rt = LevelMenuButtons[1].GetComponent(typeof(RectTransform)) as RectTransform;
-        rt.sizeDelta = new Vector2(xy, xy);
-        rt = LevelMenuButtons[2].GetComponent(typeof(RectTransform)) as RectTransform;
-        rt.sizeDelta = new Vector2(xy, xy);
+        for (int i = 0; i < 3; i++)
+            SetRectSize(LevelMenuButtons[i], xy, xy);
 
         xy = (Screen.width / Screen.height * settingsMenuScale);
-        rt = SettingImg[0].GetComponent(typeof(RectTransform)) as RectTransform;
-        rt.sizeDelta = new Vector2( xy * 2f, xy );
-        rt = SettingImg[1].GetComponent(typeof(RectTransform)) as RectTransform;
-        rt.sizeDelta = new Vector2( xy * 2f, xy );
-        rt = SettingImg[2].GetComponent(typeof(RectTransform)) as RectTransform;
-        rt.sizeDelta = new Vector2( xy * 2f, xy );
-        rt = SettingValues[0].GetComponent(typeof(RectTransform)) as RectTransform;
-        rt.sizeDelta = new Vector2(xy * 4f, xy/2);
-        rt = SettingValues[1].GetComponent(typeof(RectTransform)) as RectTransform;
-        rt.sizeDelta = new Vector2(xy * 1f, xy * 1f);
-        rt = SettingValues[2].GetComponent(typeof(RectTransform)) as RectTransform;
-        rt.sizeDelta = new Vector2(xy * 1f, xy * 1f);
-        rt = SettingValues[3].GetComponent(typeof(RectTransform)) as RectTransform;
-        rt.sizeDelta = new Vector2(xy * 1f, xy * 1f);
-        rt = SettingValues[4].GetComponent(typeof(RectTransform)) as RectTransform;
-        rt.sizeDelta = new Vector2(xy * 1f, xy * 1f);
-        rt = SettingValues[5].GetComponent(typeof(RectTransform)) as RectTransform;
-        rt.sizeDelta = new Vector2(xy * 1f, xy * 1f);
+        for (int i = 0; i < 3; i++)
+            SetRectSize(SettingImg[i], xy*2f, xy);
+
+        SetRectSize(SettingValues[0], xy * 4f, xy / 2);
+        for (int i = 1; i < 6; i++)
+            SetRectSize(SettingValues[i], xy, xy);
 
         if (mainMenuButtons.Count == 2) {
-            mainMenuButtons[0].transform.position = new Vector3(Screen.width * -0.5f, Screen.height / 2);
-            mainMenuButtons[1].transform.position = new Vector3(Screen.width * 1.5f, Screen.height / 2);
+            SetRectTransform(mainMenuButtons[0], -0.5f, 0.5f);
+            SetRectTransform(mainMenuButtons[1], 1.5f, 0.5f);
         }
         if (LevelMenuButtons.Count == 3) {
-            LevelMenuButtons[0].transform.position = new Vector3(Screen.width * 0.25f, Screen.height * -0.5f);
-            LevelMenuButtons[1].transform.position = new Vector3(Screen.width * 0.5f, Screen.height * 1.5f);
-            LevelMenuButtons[2].transform.position = new Vector3(Screen.width * 0.75f, Screen.height * -0.5f);
+            SetRectTransform(LevelMenuButtons[0], 0.25f, -0.5f);
+            SetRectTransform(LevelMenuButtons[1], 0.5f, 1.5f);
+            SetRectTransform(LevelMenuButtons[2], 0.75f, -0.5f);
         }
         if (SettingImg.Count == 3 && SettingValues.Count == 6) {
-            SettingImg[0].transform.position = new Vector3(Screen.width * -0.5f, Screen.height * 0.75f);
-            SettingImg[1].transform.position = new Vector3(Screen.width * -0.5f, Screen.height * 0.5f);
-            SettingImg[2].transform.position = new Vector3(Screen.width * -0.5f, Screen.height * 0.25f);
-            SettingValues[0].transform.position = new Vector3(Screen.width * 1.5f, Screen.height * 0.75f);
-            SettingValues[1].transform.position = new Vector3(Screen.width * 1.5f, Screen.height * 0.5f);
-            SettingValues[2].transform.position = new Vector3(Screen.width * 1.5f, Screen.height * 0.5f);
-            SettingValues[3].transform.position = new Vector3(Screen.width * 1.5f, Screen.height * 0.5f);
-            SettingValues[4].transform.position = new Vector3(Screen.width * 1.5f, Screen.height * 0.25f);
-            SettingValues[5].transform.position = new Vector3(Screen.width * 1.5f, Screen.height * 0.25f);
+            int i;
+            for (i = 0; i<3; i++)
+                SetRectTransform(SettingImg[i], -0.5f, 0.75f - i * 0.25f);
+            SetRectTransform(SettingValues[0], 1.5f, 0.75f);
+            for (i = 1; i < 4; i++)
+                SetRectTransform(SettingValues[i], 1.5f, 0.5f);
+            for (i = 4; i < 6; i++)
+                SetRectTransform(SettingValues[i], 1.5f, 0.25f);
         }
 
     }
 
+    private void SetRectSize(GameObject go,float sizeX, float sizeY)
+    {
+        RectTransform rt = go.GetComponent(typeof(RectTransform)) as RectTransform;
+        rt.sizeDelta = new Vector2(sizeX, sizeY);
+    }
+    private void SetRectTransform(GameObject go, float screenOffsetX, float screenOffsetY)
+    {
+        go.transform.position = new Vector2(Screen.width * screenOffsetX, Screen.height * screenOffsetY);
+    }
     // Update is called once per frame
     void Update () {
         if (Input.GetKeyDown(KeyCode.Escape) && !showMainMenu) MainMenuTrigger();
@@ -109,7 +99,7 @@ public class MainMenu : MonoBehaviour {
     #region Move
     private void MainMenuMove () {
         if (showMainMenu) {
-            if (mainMenuButtons[0].transform.position.x < Screen.width / 4) {
+            if (mainMenuButtons[0].transform.position.x < Screen.width *0.25f) {
                 mainMenuButtons[0].transform.Translate(showSpeed * Time.deltaTime, 0, 0);
             }
             if (mainMenuButtons[1].transform.position.x > Screen.width * 0.75f) {

@@ -46,6 +46,9 @@ namespace TD
             if (CurrentMovementEdge == null)
             {
                 LevelManager.Instance.mainTowerLifeCount -= MainTowerDamage;
+#if DEBUG
+                Debug.Log(string.Format("Отладка:{0}: NPC нанес урон главной башне - {1}.", name, MainTowerDamage));
+#endif
                 Destroy(gameObject);
             }
             else
@@ -68,7 +71,9 @@ namespace TD
             if (damagePoints <= 0)
                 throw new System.ArgumentOutOfRangeException();
             Health -= damagePoints;
+#if DEBUG
             Debug.Log(string.Format("Отладка:{0}: NPC нанесен урон - {1}, значение жизней - {2}.", name, damagePoints, Health));
+#endif
             if (Health <= 0)
                 Death();
         }
@@ -76,7 +81,9 @@ namespace TD
         // Убивает персонажа, повышает опыт игрока
         void Death()
         {
+#if DEBUG
             Debug.Log(string.Format("Отладка:{0}: NPC умер.", name));
+#endif
             LevelManager.Instance.pointsOnLvl += PlayerExperience;
             Destroy(gameObject);
         }
