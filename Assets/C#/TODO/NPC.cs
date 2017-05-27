@@ -6,7 +6,7 @@ namespace TD
     {
 
         int Health = 100; // Жизни NPC
-        int PlayerExperience = 10;  // Опыт получаемый игроком при смерти NPC
+        int PlayerExperience = 10;  // Деньги получаемые игроком при смерти NPC
         int MainTowerDamage = 10;  // Урон, который NPC наносит главной башне по достижении конца пути
 
         float Speed = 2;   // Скорость передвижения NPC 
@@ -45,7 +45,7 @@ namespace TD
 
             if (CurrentMovementEdge == null)
             {
-                LevelManager.Instance.mainTowerLifeCount -= MainTowerDamage;
+                LevelManager.Instance.CurrentLevel.DamageMainTower(MainTowerDamage);
 #if DEBUG
                 Debug.Log(string.Format("Отладка:{0}: NPC нанес урон главной башне - {1}.", name, MainTowerDamage));
 #endif
@@ -78,13 +78,14 @@ namespace TD
                 Death();
         }
 
-        // Убивает персонажа, повышает опыт игрока
+        // Убивает персонажа, дает игроку денег
         void Death()
         {
 #if DEBUG
             Debug.Log(string.Format("Отладка:{0}: NPC умер.", name));
 #endif
-            LevelManager.Instance.pointsOnLvl += PlayerExperience;
+            //TODO:Fix shit need review
+            LevelManager.Instance.CurrentLevel.GiveExperience(PlayerExperience);
             Destroy(gameObject);
         }
 

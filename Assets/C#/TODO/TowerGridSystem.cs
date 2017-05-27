@@ -42,33 +42,30 @@ namespace TD
 
         }
 
-        public void LoadData(Stream stream)
+        public void LoadData(StreamReader sr)
         {
-            using (StreamReader sr = new StreamReader(stream))
+            string[] size= sr.ReadLine().Split(' ');
+            int w, h;float gsize;
+            if (!int.TryParse(size[0], out w)||!int.TryParse(size[1], out h)|| !float.TryParse(size[2], out gsize))
+                throw new IOException("Ошибка при чтении потока");
+            cellSize = gsize;
+            grid = new TowerCell[h, w];
+
+            int i = 0, j = 0;
+
+            Utilities.ReadBlock(sr, (string _line) =>
             {
-                string[] size= sr.ReadLine().Split(' ');
-                int w, h;float gsize;
-                if (!int.TryParse(size[0], out w)||!int.TryParse(size[1], out h)|| !float.TryParse(size[2], out gsize))
-                    throw new IOException("Ошибка при чтении потока");
-                cellSize = gsize;
-                grid = new TowerCell[h, w];
-
-                int i = 0, j = 0;
-
-                Utilities.ReadBlock(sr, (string _line) =>
-                {
-                    string[] numbers = _line.Split(' ');
+                string[] numbers = _line.Split(' ');
                     
-                    for (j = 0; j < numbers.Length; j++) {
-                        int _state;
-                        if (int.TryParse(numbers[j], out _state))
-                            grid[i, j] = new TowerCell { state = (CellState)_state, tower = null };
-                        else
-                            throw new IOException("Ошибка при чтении потока");
-                    }
-                    i++;
-                } );
-            }
+                for (j = 0; j < numbers.Length; j++) {
+                    int _state;
+                    if (int.TryParse(numbers[j], out _state))
+                        grid[i, j] = new TowerCell { state = (CellState)_state, tower = null };
+                    else
+                        throw new IOException("Ошибка при чтении потока");
+                }
+                i++;
+            } );
         }
 
         //возвращает состояние ячейки находящейся в данной позиции в 3х-мерном пространстве.

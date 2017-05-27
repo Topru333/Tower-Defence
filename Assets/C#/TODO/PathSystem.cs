@@ -63,14 +63,14 @@ namespace TD
         /// </summary>
         /// <param name="wave">структура волны(все данный о волне в ней)</param>
         /// <param name="id">Индекс вершины старта волны</param>
-        public void NPCSpawn(NpcWave wave, int id)
+        public void NPCSpawn(NpcWave wave)
         {
 #if DEBUG
-            Debug.LogFormat("{0},{1},{2},{3}", wave.count, wave.delay, wave.reward, id);
+            Debug.LogFormat("Количество волн {0},{1},{2}", wave.count, wave.delay, wave.pathVertexID);
             if (wave.NPC == null) throw new ArgumentNullException("NPCSpawn - wave isn't correct - null");
-            if (wave.count <= 0 || wave.delay <= 0 || wave.reward <= 0 || id <= 0 || id >= Points.Count) throw new ArgumentOutOfRangeException("NPCSpawn - wave isn't correct");
+            if (wave.count <= 0 || wave.delay <= 0 || wave.pathVertexID <= 0 || wave.pathVertexID >= Points.Count) throw new ArgumentOutOfRangeException("NPCSpawn - wave isn't correct");
 #endif
-            var edgeList = Instance.Edges.FindAll((Edge e) => { return e.ID_in == id; });
+            var edgeList = Instance.Edges.FindAll((Edge e) => { return e.ID_in == wave.pathVertexID; });
             if (edgeList != null && edgeList.Count > 0)
             {
                 int edgeID = UnityEngine.Random.Range(0, edgeList.Count);

@@ -8,29 +8,29 @@ namespace TD
     {
 
         // TODO: Сделать списком. Так же добавить загрузку из потока
-        UpgradableParams upgradableParameters = new UpgradableParams() {
+        UpgradableParams[] upgradableParameters = new UpgradableParams[]{new UpgradableParams() {
             targetListUpdateFreq = 3f,
             TowerDamage=15,
             MaxTargetCount=2,
-            TargetSearchRadius=5,
-        }; // Список улучшаемых параметров
+            TargetSearchRadius=25
+        } }; // Список улучшаемых параметров
         List<Transform> targetList=new List<Transform>();            // Список целей
 
         uint upgradeLevel,          // Уровень башни
-             maxUpgradeLevel;       // Максимальный уровень башни
+             maxUpgradeLevel=1;       // Максимальный уровень башни
 
         float baseUpgradePrice,     // Начальная стоимость повышения уровня
               priceIncreasePercent, // Процент изменения стоимости повышения уровня
               timer,                // Для проверки частоты удара
               basePrice,            // Цена продажи
               sellPrice;            // Цена покупки
-        Texture2D icon;
+        public Sprite icon;
         public LayerMask lm;
 
         void FixedUpdate()
         {
             
-            if (timer >= upgradableParameters.TargetDamageFrequency)
+            if (timer >= upgradableParameters[upgradeLevel].TargetDamageFrequency)
             {
                 timer = 0f;
                 TargetDamage();
@@ -40,8 +40,9 @@ namespace TD
         // Инициализация
         void Awake()
         {
-            upgradableParameters.targetsMask = lm;
-            StartCoroutine("FindTargetsWithDelay", upgradableParameters.targetListUpdateFreq);
+            for(int i=0;i<maxUpgradeLevel;i++)
+                upgradableParameters[i].targetsMask = lm;
+            StartCoroutine("FindTargetsWithDelay", upgradableParameters[upgradeLevel].targetListUpdateFreq);
         }
 
         // Обновление
@@ -65,7 +66,7 @@ namespace TD
         void TargetSearch()
         {
             targetList.Clear();
-            Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, upgradableParameters.TargetSearchRadius, upgradableParameters.targetsMask); // Проверка присутствия целей в радиусе
+            Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, upgradableParameters[upgradeLevel].TargetSearchRadius, upgradableParameters[upgradeLevel].targetsMask); // Проверка присутствия целей в радиусе
             if (targetsInViewRadius.Length > 0)
             {
                 for (int i = 0; i < targetsInViewRadius.Length; i++)
@@ -76,7 +77,7 @@ namespace TD
                     {
                         float dstToTarget = Vector3.Distance(transform.position, target.position);
 
-                        if (!Physics.Raycast(transform.position, dirToTarget, dstToTarget, upgradableParameters.wallMask))
+                        if (!Physics.Raycast(transform.position, dirToTarget, dstToTarget, upgradableParameters[upgradeLevel].wallMask))
                         { // Проверка на стены между верхушкой и целью
                             targetList.Add(target);
                         }
@@ -89,12 +90,12 @@ namespace TD
         // Нанесение урона
         void TargetDamage()
         {
-            for (int i = 0; i < upgradableParameters.MaxTargetCount && i < targetList.Count; i++)
+            for (int i = 0; i < upgradableParameters[upgradeLevel].MaxTargetCount && i < targetList.Count; i++)
             {
                 if (targetList[i])
                 {
                     NPC npc = targetList[i].gameObject.GetComponent<NPC>();
-                    npc.DoDamage(upgradableParameters.TowerDamage);
+                    npc.DoDamage(upgradableParameters[upgradeLevel].TowerDamage);
                 }
             }
         }
@@ -102,10 +103,8 @@ namespace TD
         // Повышение уровня
         public void Upgrade()
         {
-            upgradeLevel++;
-            upgradableParameters.TowerDamage *= 2;
-            upgradableParameters.TargetSearchRadius *= 1.3f;
-            upgradableParameters.TargetDamageFrequency *= 1.1f;
+            if(upgradeLevel<maxUpgradeLevel)
+                upgradeLevel++;
         }
 
         // Обработчик инициализации классов наследников
@@ -130,7 +129,7 @@ namespace TD
         private void OnDrawGizmos()
         {
             Gizmos.color = new Color(Color.green.r, Color.green.g, Color.green.b, 0.5f);
-            Gizmos.DrawSphere(transform.position, upgradableParameters.TargetSearchRadius);
+            Gizmos.DrawSphere(transform.position, upgradableParameters[upgradeLevel].TargetSearchRadius);
         }
 
         // Перевод из градусов в радианы
