@@ -1,0 +1,36 @@
+leveldescblock
+towerblock
+Tower
+end
+500
+1000
+waveinfoblock
+NPC0 5 2 0
+NPC1 4 1 0
+end
+end
+towergridsystemblock
+4 5 8
+gridblock
+1 0 0 1
+1 0 1 1
+1 0 0 1
+1 1 0 1
+1 1 0 1
+end
+end
+pathsystemblock
+vertexblock
+1 4 12
+2 20 12
+3 20 20
+4 36 20
+5 36 28
+end
+edgeblock
+1 2
+2 3
+3 4
+4 5
+end
+end
