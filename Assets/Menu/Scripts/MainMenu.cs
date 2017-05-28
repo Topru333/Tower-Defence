@@ -3,57 +3,81 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MainMenu : MonoBehaviour {
-    public float showSpeed = 450f;
-    public float mainMenuScale = 250f;
-    public float levelMenuScale = 150f;
+    public float showSpeed         = 450f;
+    public float mainMenuScale     = 250f;
+    public float levelMenuScale    = 150f;
     public float settingsMenuScale = 150f;
-    public List<GameObject> mainMenuButtons = new List<GameObject>();
+    public float backButtonScale   = 150f;
+
+    public GameObject mainMenuLevels  = null;
+    public GameObject mainMenuOptions = null;
+    public GameObject qualityImg      = null;
+    public GameObject lenguageImg     = null;
+    public GameObject valumeImg       = null;
+    public GameObject valumeSlider    = null;
+    public GameObject qualityLow      = null;
+    public GameObject qualityMid      = null;
+    public GameObject qualityHig      = null;
+    public GameObject rusLenguage     = null;
+    public GameObject engLenguage     = null;
+    public GameObject backButton      = null;
     public List<GameObject> LevelMenuButtons = new List<GameObject>();
-    public List<GameObject> SettingImg = new List<GameObject>();
-    public List<GameObject> SettingValues = new List<GameObject>();
 
     // Use this for initialization
     void Start () {
-        showMainMenu = true;
-        showLevelMenu = false;
+        showMainMenu     = true;
+        showLevelMenu    = false;
         showSettingsMenu = false;
+        showBackButton   = false;
 
+        move = new moveMenu(mainMenuMove);
+        move += levelMenuMove;
+        move += settingsMenuMove;
+        move += backMove;
 
         float xy = (Screen.width / Screen.height * mainMenuScale);
-        for(int i = 0; i < 2; i++)
-            SetRectSize(mainMenuButtons[i], xy, xy);
+        SetRectSize(mainMenuLevels,  xy, xy);
+        SetRectSize(mainMenuOptions, xy, xy);
 
         xy = (Screen.width / Screen.height * levelMenuScale);
         for (int i = 0; i < 3; i++)
             SetRectSize(LevelMenuButtons[i], xy, xy);
 
         xy = (Screen.width / Screen.height * settingsMenuScale);
-        for (int i = 0; i < 3; i++)
-            SetRectSize(SettingImg[i], xy*2f, xy);
+        SetRectSize(qualityImg,  xy * 2f, xy);
+        SetRectSize(lenguageImg, xy * 2f, xy);
+        SetRectSize(valumeImg,   xy * 2f, xy);
 
-        SetRectSize(SettingValues[0], xy * 4f, xy / 2);
-        for (int i = 1; i < 6; i++)
-            SetRectSize(SettingValues[i], xy, xy);
 
-        if (mainMenuButtons.Count == 2) {
-            SetRectTransform(mainMenuButtons[0], -0.5f, 0.5f);
-            SetRectTransform(mainMenuButtons[1], 1.5f, 0.5f);
-        }
+        SetRectSize(valumeSlider, xy * 4f, xy / 2);
+        SetRectSize(qualityLow,   xy, xy);
+        SetRectSize(qualityMid,   xy, xy);
+        SetRectSize(qualityHig,   xy, xy);
+        SetRectSize(rusLenguage,  xy, xy);
+        SetRectSize(engLenguage,  xy, xy);
+
+        xy = (Screen.width / Screen.height * backButtonScale);
+        SetRectSize(backButton, xy, xy);
+
+        SetRectTransform(backButton,      0.05f, -0.5f);
+        SetRectTransform(mainMenuLevels, -0.5f,   0.5f);
+        SetRectTransform(mainMenuOptions, 1.5f,   0.5f);
+
         if (LevelMenuButtons.Count == 3) {
             SetRectTransform(LevelMenuButtons[0], 0.25f, -0.5f);
-            SetRectTransform(LevelMenuButtons[1], 0.5f, 1.5f);
+            SetRectTransform(LevelMenuButtons[1], 0.5f,   1.5f);
             SetRectTransform(LevelMenuButtons[2], 0.75f, -0.5f);
         }
-        if (SettingImg.Count == 3 && SettingValues.Count == 6) {
-            int i;
-            for (i = 0; i<3; i++)
-                SetRectTransform(SettingImg[i], -0.5f, 0.75f - i * 0.25f);
-            SetRectTransform(SettingValues[0], 1.5f, 0.75f);
-            for (i = 1; i < 4; i++)
-                SetRectTransform(SettingValues[i], 1.5f, 0.5f);
-            for (i = 4; i < 6; i++)
-                SetRectTransform(SettingValues[i], 1.5f, 0.25f);
-        }
+
+        SetRectTransform(qualityImg,  -0.5f, 0.75f);
+        SetRectTransform(lenguageImg, -0.5f, 0.75f -  0.25f);
+        SetRectTransform(valumeImg,   -0.5f, 0.75f - 2 * 0.25f);
+        SetRectTransform(valumeSlider, 1.5f, 0.75f);
+        SetRectTransform(qualityLow,   1.5f, 0.5f);
+        SetRectTransform(qualityMid,   1.5f, 0.5f);
+        SetRectTransform(qualityHig,   1.5f, 0.5f);
+        SetRectTransform(rusLenguage,  1.5f, 0.25f);
+        SetRectTransform(engLenguage,  1.5f, 0.25f);
 
     }
 
@@ -68,135 +92,101 @@ public class MainMenu : MonoBehaviour {
     }
     // Update is called once per frame
     void Update () {
-        if (Input.GetKeyDown(KeyCode.Escape) && !showMainMenu) MainMenuTrigger();
-        MainMenuMove();
-        LevelMenuMove();
-        SettingsMenuMove();
+        if (Input.GetKeyDown(KeyCode.Escape) && !showMainMenu) mainMenuTrigger();
+        move();
     }
 
     #region triggers
     private bool showMainMenu;
     private bool showLevelMenu;
     private bool showSettingsMenu;
+    private bool showBackButton;
 
-    public void MainMenuTrigger () {
-        showMainMenu = true;
-        showLevelMenu = false;
+    public void mainMenuTrigger () {
+        showMainMenu     = true;
+        showLevelMenu    = false;
+        showSettingsMenu = false;
+        showBackButton   = false;
+    }
+    public void levelMenuTrigger () {
+        showLevelMenu    = true;
+        showBackButton   = true;
+        showMainMenu     = false;
         showSettingsMenu = false;
     }
-    public void LevelMenuTrigger () {
-        showLevelMenu = true;
-        showMainMenu = false;
-        showSettingsMenu = false;
-    }
-    public void OptionsMenuTrigger () {
+    public void optionsMenuTrigger () {
         showSettingsMenu = true;
-        showMainMenu = false;
-        showLevelMenu = false;
+        showBackButton   = true;
+        showMainMenu     = false;
+        showLevelMenu    = false;
+    }
+    public void backButtonTrigger () {
+        mainMenuTrigger();
     }
     #endregion
 
     #region Move
-    private void MainMenuMove () {
+    delegate void moveMenu();
+    moveMenu move;
+
+    private void moveRectY (GameObject rect, float speed, bool when) {
+        if (when) {
+            rect.transform.Translate(0, speed * Time.deltaTime, 0);
+        }
+    }
+    private void moveRectX (GameObject rect, float speed, bool when) {
+        if (when) {
+            rect.transform.Translate(speed * Time.deltaTime, 0, 0);
+        }
+    }
+    private void backMove () {
+        if (showBackButton) { moveRectY(backButton,  showSpeed, backButton.transform.position.y < Screen.height /  10  ); }
+        else                { moveRectY(backButton, -showSpeed, backButton.transform.position.y > Screen.height * -0.5f); }
+    }
+    private void mainMenuMove () {
         if (showMainMenu) {
-            if (mainMenuButtons[0].transform.position.x < Screen.width *0.25f) {
-                mainMenuButtons[0].transform.Translate(showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (mainMenuButtons[1].transform.position.x > Screen.width * 0.75f) {
-                mainMenuButtons[1].transform.Translate(-showSpeed * Time.deltaTime, 0, 0);
-            }
+            moveRectX(mainMenuLevels,   showSpeed, mainMenuLevels.transform.position.x  < Screen.width * 0.25f);
+            moveRectX(mainMenuOptions, -showSpeed, mainMenuOptions.transform.position.x > Screen.width * 0.75f);
         }
         else {
-            if (mainMenuButtons[0].transform.position.x > Screen.width * -0.5f) {
-                mainMenuButtons[0].transform.Translate(-showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (mainMenuButtons[1].transform.position.x < Screen.width * 1.5f) {
-                mainMenuButtons[1].transform.Translate(showSpeed * Time.deltaTime, 0, 0);
-            }
+            moveRectX(mainMenuLevels, -showSpeed, mainMenuLevels.transform.position.x  > Screen.width * -0.5f);
+            moveRectX(mainMenuOptions, showSpeed, mainMenuOptions.transform.position.x < Screen.width *  1.5f);
         }
     }
-    private void LevelMenuMove () {
+    private void levelMenuMove () {
         if (showLevelMenu) {
-            if (LevelMenuButtons[0].transform.position.y < Screen.height / 2) {
-                LevelMenuButtons[0].transform.Translate(0, showSpeed * Time.deltaTime, 0);
-            }
-            if (LevelMenuButtons[1].transform.position.y > Screen.height / 2) {
-                LevelMenuButtons[1].transform.Translate(0, -showSpeed * Time.deltaTime, 0);
-            }
-            if (LevelMenuButtons[2].transform.position.y < Screen.height / 2) {
-                LevelMenuButtons[2].transform.Translate(0, showSpeed * Time.deltaTime, 0);
-            }
+            moveRectY(LevelMenuButtons[0],  showSpeed, LevelMenuButtons[0].transform.position.y < Screen.height / 2);
+            moveRectY(LevelMenuButtons[1], -showSpeed, LevelMenuButtons[1].transform.position.y > Screen.height / 2);
+            moveRectY(LevelMenuButtons[2],  showSpeed, LevelMenuButtons[2].transform.position.y < Screen.height / 2);
         }
         else {
-            if (LevelMenuButtons[0].transform.position.y > Screen.height * -0.5f) {
-                LevelMenuButtons[0].transform.Translate(0, -showSpeed * Time.deltaTime, 0);
-            }
-            if (LevelMenuButtons[1].transform.position.y < Screen.height * 1.5f) {
-                LevelMenuButtons[1].transform.Translate(0, showSpeed * Time.deltaTime, 0);
-            }
-            if (LevelMenuButtons[2].transform.position.y > Screen.height * -0.5f) {
-                LevelMenuButtons[2].transform.Translate(0, -showSpeed * Time.deltaTime, 0);
-            }
+            moveRectY(LevelMenuButtons[0], -showSpeed, LevelMenuButtons[0].transform.position.y > Screen.height * -0.5f);
+            moveRectY(LevelMenuButtons[1],  showSpeed, LevelMenuButtons[1].transform.position.y < Screen.height *  1.5f);
+            moveRectY(LevelMenuButtons[2], -showSpeed, LevelMenuButtons[2].transform.position.y > Screen.height * -0.5f);
         }
     }
-    private void SettingsMenuMove () {
+    private void settingsMenuMove () {
         if (showSettingsMenu) {
-            if (SettingImg[0].transform.position.x < Screen.width / 4) {
-                SettingImg[0].transform.Translate(showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingImg[1].transform.position.x < Screen.width / 4) {
-                SettingImg[1].transform.Translate(showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingImg[2].transform.position.x < Screen.width / 4) {
-                SettingImg[2].transform.Translate(showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingValues[0].transform.position.x > Screen.width * 0.70f) {
-                SettingValues[0].transform.Translate(-showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingValues[1].transform.position.x > Screen.width * 0.9f) {
-                SettingValues[1].transform.Translate(-showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingValues[2].transform.position.x > Screen.width * 0.70f) {
-                SettingValues[2].transform.Translate(-showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingValues[3].transform.position.x > Screen.width * 0.5f) {
-                SettingValues[3].transform.Translate(-showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingValues[4].transform.position.x > Screen.width * 0.6f) {
-                SettingValues[4].transform.Translate(-showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingValues[5].transform.position.x > Screen.width * 0.8f) {
-                SettingValues[5].transform.Translate(-showSpeed * Time.deltaTime, 0, 0);
-            }
+            moveRectX(qualityImg,    showSpeed, qualityImg.transform.position.x   < Screen.width / 4);
+            moveRectX(lenguageImg,   showSpeed, lenguageImg.transform.position.x  < Screen.width / 4);
+            moveRectX(valumeImg,     showSpeed, valumeImg.transform.position.x    < Screen.width / 4);
+            moveRectX(valumeSlider, -showSpeed, valumeSlider.transform.position.x > Screen.width * 0.70f);
+            moveRectX(qualityLow,   -showSpeed, qualityLow.transform.position.x   > Screen.width * 0.9f);
+            moveRectX(qualityMid,   -showSpeed, qualityMid.transform.position.x   > Screen.width * 0.70f);
+            moveRectX(qualityHig,   -showSpeed, qualityHig.transform.position.x   > Screen.width * 0.5f);
+            moveRectX(rusLenguage,  -showSpeed, rusLenguage.transform.position.x  > Screen.width * 0.6f);
+            moveRectX(engLenguage,  -showSpeed, engLenguage.transform.position.x  > Screen.width * 0.8f);
         }
         else {
-            if (SettingImg[0].transform.position.x > Screen.width * -0.5f) {
-                SettingImg[0].transform.Translate(-showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingImg[1].transform.position.x > Screen.width * -0.5f) {
-                SettingImg[1].transform.Translate(-showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingImg[2].transform.position.x > Screen.width * -0.5f) {
-                SettingImg[2].transform.Translate(-showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingValues[0].transform.position.x < Screen.width * 1.5f) {
-                SettingValues[0].transform.Translate(showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingValues[1].transform.position.x < Screen.width * 1.5f) {
-                SettingValues[1].transform.Translate(showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingValues[2].transform.position.x < Screen.width * 1.5f) {
-                SettingValues[2].transform.Translate(showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingValues[3].transform.position.x < Screen.width * 1.5f) {
-                SettingValues[3].transform.Translate(showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingValues[4].transform.position.x < Screen.width * 1.5f) {
-                SettingValues[4].transform.Translate(showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingValues[5].transform.position.x < Screen.width * 1.5f) {
-                SettingValues[5].transform.Translate(showSpeed * Time.deltaTime, 0, 0);
-            }
+            moveRectX(qualityImg,  -showSpeed, qualityImg.transform.position.x   > Screen.width * -0.5f);
+            moveRectX(lenguageImg, -showSpeed, lenguageImg.transform.position.x  > Screen.width * -0.5f);
+            moveRectX(valumeImg,   -showSpeed, valumeImg.transform.position.x    > Screen.width * -0.5f);
+            moveRectX(valumeSlider, showSpeed, valumeSlider.transform.position.x < Screen.width *  1.5f);
+            moveRectX(qualityLow,   showSpeed, qualityLow.transform.position.x   < Screen.width *  1.5f);
+            moveRectX(qualityMid,   showSpeed, qualityMid.transform.position.x   < Screen.width *  1.5f);
+            moveRectX(qualityHig,   showSpeed, qualityHig.transform.position.x   < Screen.width *  1.5f);
+            moveRectX(rusLenguage,  showSpeed, rusLenguage.transform.position.x  < Screen.width *  1.5f);
+            moveRectX(engLenguage,  showSpeed, engLenguage.transform.position.x  < Screen.width *  1.5f);
         }
     }
     #endregion
