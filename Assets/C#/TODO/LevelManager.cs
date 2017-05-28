@@ -27,7 +27,7 @@ namespace TD
         private bool pause = false;                                      // Состояние игры(pause - true/inGame - false)
         private float gameSpeed = 10f;                                   // Скорость игры
 
-        public Level CurrentLevel=null;
+        //public Level CurrentLevel=null; <<<<<<<
 
         // Загружает данные о путях из потока
         public void LoadPathGraph(StreamReader sr)
@@ -111,9 +111,9 @@ namespace TD
         {
             //UnityEngine.SceneManagement.SceneManager.SetActiveScene(UnityEngine.SceneManagement.SceneManager.GetSceneByName(name));
             GameObject levelHolder = new GameObject("LevelHolder");
-            CurrentLevel = levelHolder.AddComponent<Level>();
-            using (StreamReader sr = new StreamReader(File.OpenRead(Application.dataPath + "/Resources/Levels/" + name + ".txt")))
-                CurrentLevel.Load(sr);
+            //CurrentLevel = levelHolder.AddComponent<Level>(); <<<<<<<
+            using (StreamReader sr = new StreamReader(File.OpenRead(Application.dataPath + "/Resources/Levels/" + name + ".txt"))) ;
+                //CurrentLevel.Load(sr); <<<<<<<
         }
 
         // Изменение скорости игры

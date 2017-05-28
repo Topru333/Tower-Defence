@@ -45,7 +45,7 @@ namespace TD
 
             if (CurrentMovementEdge == null)
             {
-                LevelManager.Instance.CurrentLevel.DamageMainTower(MainTowerDamage);
+                // LevelManager.Instance.CurrentLevel.DamageMainTower(MainTowerDamage); <<<<<<<
 #if DEBUG
                 Debug.Log(string.Format("Отладка:{0}: NPC нанес урон главной башне - {1}.", name, MainTowerDamage));
 #endif
@@ -85,7 +85,7 @@ namespace TD
             Debug.Log(string.Format("Отладка:{0}: NPC умер.", name));
 #endif
             //TODO:Fix shit need review
-            LevelManager.Instance.CurrentLevel.GiveExperience(PlayerExperience);
+            //LevelManager.Instance.CurrentLevel.GiveExperience(PlayerExperience); <<<<<<<
             Destroy(gameObject);
         }
 
