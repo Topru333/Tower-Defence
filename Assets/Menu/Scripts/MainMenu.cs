@@ -1,37 +1,47 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour {
-    public float showSpeed         = 450f;
-    public float mainMenuScale     = 250f;
-    public float levelMenuScale    = 150f;
-    public float settingsMenuScale = 150f;
-    public float backButtonScale   = 150f;
 
-    public GameObject mainMenuLevels  = null;
-    public GameObject mainMenuOptions = null;
-    public GameObject qualityImg      = null;
-    public GameObject lenguageImg     = null;
-    public GameObject valumeImg       = null;
-    public GameObject valumeSlider    = null;
-    public GameObject qualityLow      = null;
-    public GameObject qualityMid      = null;
-    public GameObject qualityHig      = null;
-    public GameObject rusLenguage     = null;
-    public GameObject engLenguage     = null;
-    public GameObject backButton      = null;
-    public List<GameObject> LevelMenuButtons = new List<GameObject>();
+    LevelsMenu levelsMenu;
+
+    public float showSpeed            = 450f; // Скорость анимации движений
+    public float mainMenuScale        = 250f; // Относительность главного меню
+    public float levelMenuScale       = 150f; // Относительность меню уровней
+    public float settingsMenuScale    = 150f; // Относительность меню настроек
+    public float backButtonScale      = 150f; // Относительность кнопки возврата в гл. меню
+
+    public GameObject canvas          = null; // Канвась для хранения кнопок
+
+    public GameObject mainMenuLevels  = null; // Кнопка уровней на гл. меню
+    public GameObject mainMenuOptions = null; // Кнопка настроек на гл. меню
+    public GameObject qualityImg      = null; // Картинка обозначающая качество графики
+    public GameObject lenguageImg     = null; // Картинка обозначающая язык
+    public GameObject valumeImg       = null; // Картинка обозначающая звук
+    public GameObject valumeSlider    = null; // Сдайдер состояния громкости
+    public GameObject qualityLow      = null; // Кнопка низкого качества
+    public GameObject qualityMid      = null; // Кнопка среднего качества
+    public GameObject qualityHig      = null; // Кнопка высокого качества
+    public GameObject rusLenguage     = null; // Кнопка русского языка
+    public GameObject engLenguage     = null; // Кнопка английского языка
+    public GameObject prefabLevel     = null; // Префаб кнопки уровня
+    public GameObject backButton      = null; // Кнопка возврата в гл. меню
+
+
 
     // Use this for initialization
     void Start () {
+        levelsMenu = new LevelsMenu(new List<GameObject>(), GetComponent<LevelLoader>(),prefabLevel,canvas, showSpeed);
+        levelsMenu.createButtons();
+
         showMainMenu     = true;
-        showLevelMenu    = false;
         showSettingsMenu = false;
         showBackButton   = false;
 
         move = new moveMenu(mainMenuMove);
-        move += levelMenuMove;
+        move += levelsMenu.move;
         move += settingsMenuMove;
         move += backMove;
 
@@ -39,9 +49,7 @@ public class MainMenu : MonoBehaviour {
         SetRectSize(mainMenuLevels,  xy, xy);
         SetRectSize(mainMenuOptions, xy, xy);
 
-        xy = (Screen.width / Screen.height * levelMenuScale);
-        for (int i = 0; i < 3; i++)
-            SetRectSize(LevelMenuButtons[i], xy, xy);
+        levelsMenu.setRectSizeLevels(Screen.width / Screen.height * levelMenuScale);
 
         xy = (Screen.width / Screen.height * settingsMenuScale);
         SetRectSize(qualityImg,  xy * 2f, xy);
@@ -63,11 +71,7 @@ public class MainMenu : MonoBehaviour {
         SetRectTransform(mainMenuLevels, -0.5f,   0.5f);
         SetRectTransform(mainMenuOptions, 1.5f,   0.5f);
 
-        if (LevelMenuButtons.Count == 3) {
-            SetRectTransform(LevelMenuButtons[0], 0.25f, -0.5f);
-            SetRectTransform(LevelMenuButtons[1], 0.5f,   1.5f);
-            SetRectTransform(LevelMenuButtons[2], 0.75f, -0.5f);
-        }
+        levelsMenu.setRectTransLevels(0.25f, -0.5f, 0.5f, 1.5f, 0.75f, -0.5f); // Место трех уровней с которых начнем крутить
 
         SetRectTransform(qualityImg,  -0.5f, 0.75f);
         SetRectTransform(lenguageImg, -0.5f, 0.75f -  0.25f);
@@ -90,6 +94,7 @@ public class MainMenu : MonoBehaviour {
     {
         go.transform.position = new Vector2(Screen.width * screenOffsetX, Screen.height * screenOffsetY);
     }
+
     // Update is called once per frame
     void Update () {
         if (Input.GetKeyDown(KeyCode.Escape) && !showMainMenu) mainMenuTrigger();
@@ -98,18 +103,17 @@ public class MainMenu : MonoBehaviour {
 
     #region triggers
     private bool showMainMenu;
-    private bool showLevelMenu;
     private bool showSettingsMenu;
     private bool showBackButton;
 
     public void mainMenuTrigger () {
         showMainMenu     = true;
-        showLevelMenu    = false;
+        levelsMenu.turnOff();
         showSettingsMenu = false;
         showBackButton   = false;
     }
     public void levelMenuTrigger () {
-        showLevelMenu    = true;
+        levelsMenu.turnOn();
         showBackButton   = true;
         showMainMenu     = false;
         showSettingsMenu = false;
@@ -118,7 +122,7 @@ public class MainMenu : MonoBehaviour {
         showSettingsMenu = true;
         showBackButton   = true;
         showMainMenu     = false;
-        showLevelMenu    = false;
+        levelsMenu.turnOff();
     }
     public void backButtonTrigger () {
         mainMenuTrigger();
@@ -129,12 +133,12 @@ public class MainMenu : MonoBehaviour {
     delegate void moveMenu();
     moveMenu move;
 
-    private void moveRectY (GameObject rect, float speed, bool when) {
+    private static void moveRectY (GameObject rect, float speed, bool when) {
         if (when) {
             rect.transform.Translate(0, speed * Time.deltaTime, 0);
         }
     }
-    private void moveRectX (GameObject rect, float speed, bool when) {
+    private static void moveRectX (GameObject rect, float speed, bool when) {
         if (when) {
             rect.transform.Translate(speed * Time.deltaTime, 0, 0);
         }
@@ -151,18 +155,6 @@ public class MainMenu : MonoBehaviour {
         else {
             moveRectX(mainMenuLevels, -showSpeed, mainMenuLevels.transform.position.x  > Screen.width * -0.5f);
             moveRectX(mainMenuOptions, showSpeed, mainMenuOptions.transform.position.x < Screen.width *  1.5f);
-        }
-    }
-    private void levelMenuMove () {
-        if (showLevelMenu) {
-            moveRectY(LevelMenuButtons[0],  showSpeed, LevelMenuButtons[0].transform.position.y < Screen.height / 2);
-            moveRectY(LevelMenuButtons[1], -showSpeed, LevelMenuButtons[1].transform.position.y > Screen.height / 2);
-            moveRectY(LevelMenuButtons[2],  showSpeed, LevelMenuButtons[2].transform.position.y < Screen.height / 2);
-        }
-        else {
-            moveRectY(LevelMenuButtons[0], -showSpeed, LevelMenuButtons[0].transform.position.y > Screen.height * -0.5f);
-            moveRectY(LevelMenuButtons[1],  showSpeed, LevelMenuButtons[1].transform.position.y < Screen.height *  1.5f);
-            moveRectY(LevelMenuButtons[2], -showSpeed, LevelMenuButtons[2].transform.position.y > Screen.height * -0.5f);
         }
     }
     private void settingsMenuMove () {
@@ -190,4 +182,83 @@ public class MainMenu : MonoBehaviour {
         }
     }
     #endregion
+
+    
+
+
+    private class LevelsMenu{
+
+        private List<GameObject> levelMenuButtons;  // Список кнопок уровней
+        private List<LevelData>  levelsData;        // Список информации о уровнях
+        private LevelLoader      levelLoader;       // Загрузчик уровней
+        private GameObject       buttonPrefab;      // Шаблон кнопок
+        private GameObject       canvas;            // Канвас для кнопок
+        private bool             active;            // Флаг активно ли меню
+        private float            showspeed;         // Скорость анимации 
+        public void turnOn () {
+            active = true;
+        }
+        public void turnOff () {
+            active = false;
+        }
+
+        public List<GameObject> getButtons {
+            get {
+                return levelMenuButtons;
+            }
+        }
+
+        // Движение из за границ при открытии меню уровней
+        public void move () {
+            if (active) {
+                if (levelMenuButtons.Count > 0) moveRectY(levelMenuButtons[0],  showspeed, levelMenuButtons[0].transform.position.y < Screen.height / 2);
+                if (levelMenuButtons.Count > 1) moveRectY(levelMenuButtons[1], -showspeed, levelMenuButtons[1].transform.position.y > Screen.height / 2);
+                if (levelMenuButtons.Count > 2) moveRectY(levelMenuButtons[2],  showspeed, levelMenuButtons[2].transform.position.y < Screen.height / 2);
+            }
+            else {
+                if (levelMenuButtons.Count > 0) moveRectY(levelMenuButtons[0], -showspeed, levelMenuButtons[0].transform.position.y > Screen.height * -0.5f);
+                if (levelMenuButtons.Count > 1) moveRectY(levelMenuButtons[1],  showspeed, levelMenuButtons[1].transform.position.y < Screen.height *  1.5f);
+                if (levelMenuButtons.Count > 2) moveRectY(levelMenuButtons[2], -showspeed, levelMenuButtons[2].transform.position.y > Screen.height * -0.5f);
+            }
+        }
+
+        // Размер кнопок
+        public void setRectSizeLevels (float xy) {
+            for (int i = 0; i < 3; i++)
+                SetRectSize(levelMenuButtons[i], xy, xy);
+        }
+
+        // Место кнопок в которых они появляются
+        public void setRectTransLevels (float x1, float y1, float x2, float y2, float x3, float y3) {
+            if (levelMenuButtons.Count > 0) SetRectTransform(levelMenuButtons[0], 0.25f, -0.5f);
+            if (levelMenuButtons.Count > 1) SetRectTransform(levelMenuButtons[1], 0.5f,   1.5f);
+            if (levelMenuButtons.Count > 2) SetRectTransform(levelMenuButtons[2], 0.75f, -0.5f);
+        }
+
+        private void SetRectSize (GameObject go, float sizeX, float sizeY) {
+            RectTransform rt = go.GetComponent(typeof(RectTransform)) as RectTransform;
+            rt.sizeDelta = new Vector2(sizeX, sizeY);
+        }
+        private void SetRectTransform (GameObject go, float screenOffsetX, float screenOffsetY) {
+            go.transform.position = new Vector2(Screen.width * screenOffsetX, Screen.height * screenOffsetY);
+        }
+
+        public void createButtons () {
+            levelsData = levelLoader.getLevels;
+            for (int i = 0; i < levelsData.Count; i++) {
+                levelMenuButtons.Add(Instantiate(buttonPrefab));
+                levelMenuButtons[i].GetComponent<Image>().sprite = Sprite.Create(levelsData[i].icon, new Rect(0, 0, 128, 128), new Vector2(0.2f, 0.2f));
+                levelMenuButtons[i].transform.parent = canvas.transform;
+            }
+        }
+
+        public LevelsMenu (List<GameObject> levelMenuButtons, LevelLoader levelLoader, GameObject buttonPrefab, GameObject canvas, float showspeed) {
+            this.levelMenuButtons = levelMenuButtons;
+            this.levelLoader      = levelLoader;
+            this.buttonPrefab     = buttonPrefab;
+            this.canvas           = canvas;
+            this.showspeed        = showspeed;
+        }
+
+    }
 }
