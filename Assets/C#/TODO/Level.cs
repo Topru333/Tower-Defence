@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -15,6 +16,9 @@ namespace TD
 
         private float timer = 0;
         private bool waveStarted = false;
+        private int currentWaveNPC_counter=0;
+        public string level_name;
+
         public void Load(StreamReader sr)
         {
             //TODO: Добавить комментарии
@@ -48,6 +52,7 @@ namespace TD
                     throw new IOException("Невозможно считать информацию о волне NPC, ошибка при парсинге вершины для системы путей.");
                 waves.Push(wave);
             });
+
             line = sr.ReadLine();
             sr.ReadLine();
             TowerGridSystem.Instance.LoadData(sr);
@@ -57,21 +62,34 @@ namespace TD
             sr.ReadLine();
         }
 
+        public int GetMainTowerLifeCount()
+        {
+            return mainTowerLifeCount;
+        }
+
         private void Update()
         {
             var ingameUI = IngameUI.Instance;
             if (waves.Count > 0)
             {
                 if (waveStarted && timer <= 0)
-                {                    
+                {
                     WaveStart();
                 }
                 timer -= Time.deltaTime;
             }
+            else if (currentWaveNPC_counter <= 0)
+                ingameUI.ShowEndLevelDialog(true);
             ingameUI.UpdateExperince(experience);
             ingameUI.UpdateGold(money);
-            
+            ingameUI.UpdateMainTowerState(mainTowerLifeCount);
         }
+
+        public void GiveMoney(int goldGiven)
+        {
+            money += goldGiven;
+        }
+
         // Метод вызова волн
         public void WaveStart()
         {
@@ -79,12 +97,22 @@ namespace TD
             NpcWave npcWave = waves.Pop();
             waveStarted = true;
             timer = npcWave.count * npcWave.delay+20;
+            currentWaveNPC_counter = npcWave.count;
             PathSystem.Instance.NPCSpawn(npcWave);
+        }
+        public void DecreaseNPC_Counter() {
+            currentWaveNPC_counter--;
         }
 
         // Наносит урон главной башне
         public void DamageMainTower(int damage) {
-            mainTowerLifeCount -= damage;
+            if (damage > mainTowerLifeCount)
+                mainTowerLifeCount = 0;
+            else
+                mainTowerLifeCount -= damage;
+
+            if(mainTowerLifeCount<=0)
+                IngameUI.Instance.ShowEndLevelDialog(false);
         }
 
         public List<GameObject> GetAvaliableToBuildTowers()

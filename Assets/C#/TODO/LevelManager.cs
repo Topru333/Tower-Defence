@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 namespace TD
 {
     public class LevelManager : MonoBehaviour
@@ -24,8 +25,8 @@ namespace TD
         private Dictionary<string, GameObject> base_towers = new Dictionary<string, GameObject>();    // Список башен доступных для постройки
         private Dictionary<string, GameObject> base_npcs   = new Dictionary<string, GameObject>();    // Список башен доступных для постройки
 
-        private bool pause = false;                                      // Состояние игры(pause - true/inGame - false)
-        private float gameSpeed = 10f;                                   // Скорость игры
+        private bool pause = true;                                      // Состояние игры(pause - true/inGame - false)
+        private float gameSpeed = 1f;                                   // Скорость игры
 
         public Level CurrentLevel=null;
 
@@ -92,7 +93,8 @@ namespace TD
         // «Инициализация»
         public void Awake()
         {
-            Stream objectListStream=File.OpenRead(Application.dataPath + "/Resources/objectlist.txt");
+            TextAsset objectList= Resources.Load<TextAsset>("objectlist");
+            Stream objectListStream = new MemoryStream(objectList.bytes);
             using (StreamReader sr = new StreamReader(objectListStream))
             {
                 LoadNPCList(sr);
@@ -109,23 +111,36 @@ namespace TD
         // Метод загрузки уровня
         public void LevelLoad(string name)
         {
-            //UnityEngine.SceneManagement.SceneManager.SetActiveScene(UnityEngine.SceneManagement.SceneManager.GetSceneByName(name));
+            //Scene levelScene = SceneManager.CreateScene(name);
+            
+            //SceneManager.SetActiveScene(levelScene);
+            //GameObject ingameMenu = Resources.Load<GameObject>("Menus/InGameMenu");
+
             GameObject levelHolder = new GameObject("LevelHolder");
             CurrentLevel = levelHolder.AddComponent<Level>();
-            using (StreamReader sr = new StreamReader(File.OpenRead(Application.dataPath + "/Resources/Levels/" + name + ".txt")))
+            CurrentLevel.level_name = name;
+            TextAsset level = Resources.Load<TextAsset>("Levels/" + name);
+            Stream levelStream = new MemoryStream(level.bytes);
+            //Instantiate(ingameMenu);
+            using (StreamReader sr = new StreamReader(levelStream))
                 CurrentLevel.Load(sr);
         }
 
         // Изменение скорости игры
         public void GameSpeed(float speed)
         {
-
+            gameSpeed = speed;
+            Time.timeScale = gameSpeed;
         }
 
         // Переход в режим "пауза"(и обратно)
         public void Pause()
         {
             pause = !pause;
+            if(pause)
+                Time.timeScale = 0;
+            else
+                Time.timeScale = gameSpeed;
         }
 
         // Метод завершения уровня
