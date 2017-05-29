@@ -1,59 +1,88 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour {
-    public float showSpeed = 450f;
-    public float mainMenuScale = 250f;
-    public float levelMenuScale = 150f;
-    public float settingsMenuScale = 150f;
-    public List<GameObject> mainMenuButtons = new List<GameObject>();
-    public List<GameObject> LevelMenuButtons = new List<GameObject>();
-    public List<GameObject> SettingImg = new List<GameObject>();
-    public List<GameObject> SettingValues = new List<GameObject>();
+
+    LevelsMenu levelsMenu;
+
+    public float showSpeed                   = 450f; // Скорость анимации движений
+    public float mainMenuScale               = 250f; // Относительность главного меню
+    public float levelMenuScale              = 150f; // Относительность меню уровней
+    public float settingsMenuScale           = 150f; // Относительность меню настроек
+    public float backButtonScale             = 150f; // Относительность кнопки возврата в гл. меню
+
+    public GameObject canvas                 = null; // Канвась для хранения кнопок
+
+    public GameObject mainMenuLevels         = null; // Кнопка уровней на гл. меню
+    public GameObject mainMenuOptions        = null; // Кнопка настроек на гл. меню
+    public GameObject qualityImg             = null; // Картинка обозначающая качество графики
+    public GameObject lenguageImg            = null; // Картинка обозначающая язык
+    public GameObject valumeImg              = null; // Картинка обозначающая звук
+    public GameObject valumeSlider           = null; // Сдайдер состояния громкости
+    public GameObject qualityLow             = null; // Кнопка низкого качества
+    public GameObject qualityMid             = null; // Кнопка среднего качества
+    public GameObject qualityHig             = null; // Кнопка высокого качества
+    public GameObject rusLenguage            = null; // Кнопка русского языка
+    public GameObject engLenguage            = null; // Кнопка английского языка
+    public GameObject prefabLevel            = null; // Префаб кнопки уровня
+    public GameObject prefabDescriptionLevel = null; // Префаб панельки с описанием уровня
+    public GameObject backButton             = null; // Кнопка возврата в гл. меню
+
+
 
     // Use this for initialization
     void Start () {
-        showMainMenu = true;
-        showLevelMenu = false;
-        showSettingsMenu = false;
+        levelsMenu = new LevelsMenu(new List<GameObject>(), GetComponent<LevelLoader>(),prefabLevel,canvas, showSpeed, prefabDescriptionLevel);
+        levelsMenu.createButtons();
 
+        showMainMenu     = true;
+        showSettingsMenu = false;
+        showBackButton   = false;
+
+        move = new moveMenu(mainMenuMove);
+        move += levelsMenu.move;
+        move += settingsMenuMove;
+        move += backMove;
 
         float xy = (Screen.width / Screen.height * mainMenuScale);
-        for(int i = 0; i < 2; i++)
-            SetRectSize(mainMenuButtons[i], xy, xy);
+        SetRectSize(mainMenuLevels,  xy, xy);
+        SetRectSize(mainMenuOptions, xy, xy);
 
-        xy = (Screen.width / Screen.height * levelMenuScale);
-        for (int i = 0; i < 3; i++)
-            SetRectSize(LevelMenuButtons[i], xy, xy);
+        levelsMenu.setRectSizeLevels(Screen.width / Screen.height * levelMenuScale);
 
         xy = (Screen.width / Screen.height * settingsMenuScale);
-        for (int i = 0; i < 3; i++)
-            SetRectSize(SettingImg[i], xy*2f, xy);
+        SetRectSize(qualityImg,  xy * 2f, xy);
+        SetRectSize(lenguageImg, xy * 2f, xy);
+        SetRectSize(valumeImg,   xy * 2f, xy);
 
-        SetRectSize(SettingValues[0], xy * 4f, xy / 2);
-        for (int i = 1; i < 6; i++)
-            SetRectSize(SettingValues[i], xy, xy);
 
-        if (mainMenuButtons.Count == 2) {
-            SetRectTransform(mainMenuButtons[0], -0.5f, 0.5f);
-            SetRectTransform(mainMenuButtons[1], 1.5f, 0.5f);
-        }
-        if (LevelMenuButtons.Count == 3) {
-            SetRectTransform(LevelMenuButtons[0], 0.25f, -0.5f);
-            SetRectTransform(LevelMenuButtons[1], 0.5f, 1.5f);
-            SetRectTransform(LevelMenuButtons[2], 0.75f, -0.5f);
-        }
-        if (SettingImg.Count == 3 && SettingValues.Count == 6) {
-            int i;
-            for (i = 0; i<3; i++)
-                SetRectTransform(SettingImg[i], -0.5f, 0.75f - i * 0.25f);
-            SetRectTransform(SettingValues[0], 1.5f, 0.75f);
-            for (i = 1; i < 4; i++)
-                SetRectTransform(SettingValues[i], 1.5f, 0.5f);
-            for (i = 4; i < 6; i++)
-                SetRectTransform(SettingValues[i], 1.5f, 0.25f);
-        }
+        SetRectSize(valumeSlider, xy * 4f, xy / 2);
+        SetRectSize(qualityLow,   xy, xy);
+        SetRectSize(qualityMid,   xy, xy);
+        SetRectSize(qualityHig,   xy, xy);
+        SetRectSize(rusLenguage,  xy, xy);
+        SetRectSize(engLenguage,  xy, xy);
+
+        xy = (Screen.width / Screen.height * backButtonScale);
+        SetRectSize(backButton, xy, xy);
+
+        SetRectTransform(backButton,      0.05f, -0.5f);
+        SetRectTransform(mainMenuLevels, -0.5f,   0.5f);
+        SetRectTransform(mainMenuOptions, 1.5f,   0.5f);
+
+        levelsMenu.setRectTransLevels(0.25f, -0.5f, 0.5f, 1.5f, 0.75f, -0.5f); // Место трех уровней с которых начнем крутить
+
+        SetRectTransform(qualityImg,  -0.5f, 0.75f);
+        SetRectTransform(lenguageImg, -0.5f, 0.75f -  0.25f);
+        SetRectTransform(valumeImg,   -0.5f, 0.75f - 2 * 0.25f);
+        SetRectTransform(valumeSlider, 1.5f, 0.75f);
+        SetRectTransform(qualityLow,   1.5f, 0.5f);
+        SetRectTransform(qualityMid,   1.5f, 0.5f);
+        SetRectTransform(qualityHig,   1.5f, 0.5f);
+        SetRectTransform(rusLenguage,  1.5f, 0.25f);
+        SetRectTransform(engLenguage,  1.5f, 0.25f);
 
     }
 
@@ -66,138 +95,228 @@ public class MainMenu : MonoBehaviour {
     {
         go.transform.position = new Vector2(Screen.width * screenOffsetX, Screen.height * screenOffsetY);
     }
+
     // Update is called once per frame
     void Update () {
-        if (Input.GetKeyDown(KeyCode.Escape) && !showMainMenu) MainMenuTrigger();
-        MainMenuMove();
-        LevelMenuMove();
-        SettingsMenuMove();
+        if (Input.GetKeyDown(KeyCode.Escape) && !showMainMenu) mainMenuTrigger();
+        move();
     }
 
     #region triggers
     private bool showMainMenu;
-    private bool showLevelMenu;
     private bool showSettingsMenu;
+    private bool showBackButton;
 
-    public void MainMenuTrigger () {
-        showMainMenu = true;
-        showLevelMenu = false;
+    public void mainMenuTrigger () {
+        showMainMenu     = true;
+        levelsMenu.turnOff();
+        showSettingsMenu = false;
+        showBackButton   = false;
+    }
+    public void levelMenuTrigger () {
+        levelsMenu.turnOn();
+        showBackButton   = true;
+        showMainMenu     = false;
         showSettingsMenu = false;
     }
-    public void LevelMenuTrigger () {
-        showLevelMenu = true;
-        showMainMenu = false;
-        showSettingsMenu = false;
-    }
-    public void OptionsMenuTrigger () {
+    public void optionsMenuTrigger () {
         showSettingsMenu = true;
-        showMainMenu = false;
-        showLevelMenu = false;
+        showBackButton   = true;
+        showMainMenu     = false;
+        levelsMenu.turnOff();
+    }
+    public void backButtonTrigger () {
+        mainMenuTrigger();
     }
     #endregion
 
     #region Move
-    private void MainMenuMove () {
+    delegate void moveMenu();
+    moveMenu move;
+
+    private static void moveRectY (GameObject rect, float speed, bool when) {
+        if (when) {
+            rect.transform.Translate(0, speed * Time.deltaTime, 0);
+        }
+    }
+    private static void moveRectX (GameObject rect, float speed, bool when) {
+        if (when) {
+            rect.transform.Translate(speed * Time.deltaTime, 0, 0);
+        }
+    }
+    private void backMove () {
+        if (showBackButton) { moveRectY(backButton,  showSpeed, backButton.transform.position.y < Screen.height /  10  ); }
+        else                { moveRectY(backButton, -showSpeed, backButton.transform.position.y > Screen.height * -0.5f); }
+    }
+    private void mainMenuMove () {
         if (showMainMenu) {
-            if (mainMenuButtons[0].transform.position.x < Screen.width *0.25f) {
-                mainMenuButtons[0].transform.Translate(showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (mainMenuButtons[1].transform.position.x > Screen.width * 0.75f) {
-                mainMenuButtons[1].transform.Translate(-showSpeed * Time.deltaTime, 0, 0);
-            }
+            moveRectX(mainMenuLevels,   showSpeed, mainMenuLevels.transform.position.x  < Screen.width * 0.25f);
+            moveRectX(mainMenuOptions, -showSpeed, mainMenuOptions.transform.position.x > Screen.width * 0.75f);
         }
         else {
-            if (mainMenuButtons[0].transform.position.x > Screen.width * -0.5f) {
-                mainMenuButtons[0].transform.Translate(-showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (mainMenuButtons[1].transform.position.x < Screen.width * 1.5f) {
-                mainMenuButtons[1].transform.Translate(showSpeed * Time.deltaTime, 0, 0);
-            }
+            moveRectX(mainMenuLevels, -showSpeed, mainMenuLevels.transform.position.x  > Screen.width * -0.5f);
+            moveRectX(mainMenuOptions, showSpeed, mainMenuOptions.transform.position.x < Screen.width *  1.5f);
         }
     }
-    private void LevelMenuMove () {
-        if (showLevelMenu) {
-            if (LevelMenuButtons[0].transform.position.y < Screen.height / 2) {
-                LevelMenuButtons[0].transform.Translate(0, showSpeed * Time.deltaTime, 0);
-            }
-            if (LevelMenuButtons[1].transform.position.y > Screen.height / 2) {
-                LevelMenuButtons[1].transform.Translate(0, -showSpeed * Time.deltaTime, 0);
-            }
-            if (LevelMenuButtons[2].transform.position.y < Screen.height / 2) {
-                LevelMenuButtons[2].transform.Translate(0, showSpeed * Time.deltaTime, 0);
-            }
-        }
-        else {
-            if (LevelMenuButtons[0].transform.position.y > Screen.height * -0.5f) {
-                LevelMenuButtons[0].transform.Translate(0, -showSpeed * Time.deltaTime, 0);
-            }
-            if (LevelMenuButtons[1].transform.position.y < Screen.height * 1.5f) {
-                LevelMenuButtons[1].transform.Translate(0, showSpeed * Time.deltaTime, 0);
-            }
-            if (LevelMenuButtons[2].transform.position.y > Screen.height * -0.5f) {
-                LevelMenuButtons[2].transform.Translate(0, -showSpeed * Time.deltaTime, 0);
-            }
-        }
-    }
-    private void SettingsMenuMove () {
+    private void settingsMenuMove () {
         if (showSettingsMenu) {
-            if (SettingImg[0].transform.position.x < Screen.width / 4) {
-                SettingImg[0].transform.Translate(showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingImg[1].transform.position.x < Screen.width / 4) {
-                SettingImg[1].transform.Translate(showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingImg[2].transform.position.x < Screen.width / 4) {
-                SettingImg[2].transform.Translate(showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingValues[0].transform.position.x > Screen.width * 0.70f) {
-                SettingValues[0].transform.Translate(-showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingValues[1].transform.position.x > Screen.width * 0.9f) {
-                SettingValues[1].transform.Translate(-showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingValues[2].transform.position.x > Screen.width * 0.70f) {
-                SettingValues[2].transform.Translate(-showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingValues[3].transform.position.x > Screen.width * 0.5f) {
-                SettingValues[3].transform.Translate(-showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingValues[4].transform.position.x > Screen.width * 0.6f) {
-                SettingValues[4].transform.Translate(-showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingValues[5].transform.position.x > Screen.width * 0.8f) {
-                SettingValues[5].transform.Translate(-showSpeed * Time.deltaTime, 0, 0);
-            }
+            moveRectX(qualityImg,    showSpeed, qualityImg.transform.position.x   < Screen.width / 4);
+            moveRectX(lenguageImg,   showSpeed, lenguageImg.transform.position.x  < Screen.width / 4);
+            moveRectX(valumeImg,     showSpeed, valumeImg.transform.position.x    < Screen.width / 4);
+            moveRectX(valumeSlider, -showSpeed, valumeSlider.transform.position.x > Screen.width * 0.70f);
+            moveRectX(qualityLow,   -showSpeed, qualityLow.transform.position.x   > Screen.width * 0.9f);
+            moveRectX(qualityMid,   -showSpeed, qualityMid.transform.position.x   > Screen.width * 0.70f);
+            moveRectX(qualityHig,   -showSpeed, qualityHig.transform.position.x   > Screen.width * 0.5f);
+            moveRectX(rusLenguage,  -showSpeed, rusLenguage.transform.position.x  > Screen.width * 0.6f);
+            moveRectX(engLenguage,  -showSpeed, engLenguage.transform.position.x  > Screen.width * 0.8f);
         }
         else {
-            if (SettingImg[0].transform.position.x > Screen.width * -0.5f) {
-                SettingImg[0].transform.Translate(-showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingImg[1].transform.position.x > Screen.width * -0.5f) {
-                SettingImg[1].transform.Translate(-showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingImg[2].transform.position.x > Screen.width * -0.5f) {
-                SettingImg[2].transform.Translate(-showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingValues[0].transform.position.x < Screen.width * 1.5f) {
-                SettingValues[0].transform.Translate(showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingValues[1].transform.position.x < Screen.width * 1.5f) {
-                SettingValues[1].transform.Translate(showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingValues[2].transform.position.x < Screen.width * 1.5f) {
-                SettingValues[2].transform.Translate(showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingValues[3].transform.position.x < Screen.width * 1.5f) {
-                SettingValues[3].transform.Translate(showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingValues[4].transform.position.x < Screen.width * 1.5f) {
-                SettingValues[4].transform.Translate(showSpeed * Time.deltaTime, 0, 0);
-            }
-            if (SettingValues[5].transform.position.x < Screen.width * 1.5f) {
-                SettingValues[5].transform.Translate(showSpeed * Time.deltaTime, 0, 0);
-            }
+            moveRectX(qualityImg,  -showSpeed, qualityImg.transform.position.x   > Screen.width * -0.5f);
+            moveRectX(lenguageImg, -showSpeed, lenguageImg.transform.position.x  > Screen.width * -0.5f);
+            moveRectX(valumeImg,   -showSpeed, valumeImg.transform.position.x    > Screen.width * -0.5f);
+            moveRectX(valumeSlider, showSpeed, valumeSlider.transform.position.x < Screen.width *  1.5f);
+            moveRectX(qualityLow,   showSpeed, qualityLow.transform.position.x   < Screen.width *  1.5f);
+            moveRectX(qualityMid,   showSpeed, qualityMid.transform.position.x   < Screen.width *  1.5f);
+            moveRectX(qualityHig,   showSpeed, qualityHig.transform.position.x   < Screen.width *  1.5f);
+            moveRectX(rusLenguage,  showSpeed, rusLenguage.transform.position.x  < Screen.width *  1.5f);
+            moveRectX(engLenguage,  showSpeed, engLenguage.transform.position.x  < Screen.width *  1.5f);
         }
     }
     #endregion
+
+
+
+    // Минимум 3 уровня!!!!!! 
+    // Minimum 3 levels!!!!!!
+    private class LevelsMenu{
+
+        private int centerIndex;
+
+        private GameObject leftObject, 
+                           centerObject, 
+                           rightObject;
+
+        private bool rightExist {
+            get {
+                if (centerIndex+1 < levelMenuButtons.Count - 1) return true;
+                else return false;
+            }
+        }
+
+        public void moveRight () {
+            if(rightExist) {
+                animateRight(++centerIndex);
+            }
+            else {
+                animateEndRight();
+                centerIndex = levelMenuButtons.Count - 1;
+            }
+        }
+
+        private void animateRight (int newCenter) {
+            // Здесь должно быть движение но пока что как то так :D
+            rightObject = levelMenuButtons[++newCenter];
+            centerObject = levelMenuButtons[newCenter];
+            leftObject = levelMenuButtons[--newCenter];
+        }
+        private void animateEndRight () {
+            rightObject = null;
+            centerObject = levelMenuButtons[levelMenuButtons.Count - 1];
+            leftObject = levelMenuButtons[levelMenuButtons.Count - 2];
+        }
+
+        private List<GameObject> levelMenuButtons;  // Список кнопок уровней
+        private List<LevelData>  levelsData;        // Список информации о уровнях
+        private LevelLoader      levelLoader;       // Загрузчик уровней
+        private GameObject       buttonPrefab;      // Шаблон кнопок
+        private GameObject       panel;       // Панель с описанием уровня
+        private GameObject       canvas;            // Канвас для кнопок
+        private bool             active;            // Флаг активно ли меню
+        private float            showspeed;         // Скорость анимации 
+        public void turnOn () {
+            active = true;
+        }
+        public void turnOff () {
+            active = false;
+        }
+
+        public List<GameObject> getButtons {
+            get {
+                return levelMenuButtons;
+            }
+        }
+
+        // Движение из за границ при открытии меню уровней
+        public void move () {
+            updateText();
+            if (active) {
+                if (leftObject != null)  moveRectY(leftObject,    showspeed, leftObject.transform.position.y   < Screen.height / 2);
+                if (rightObject != null) moveRectY(rightObject,   showspeed, rightObject.transform.position.y  < Screen.height / 2);
+                                         moveRectY(centerObject, -showspeed, centerObject.transform.position.y > Screen.height / 2);
+                                         moveRectY(panel,         showspeed, panel.transform.position.y        < Screen.height / 7);
+            }
+            else {
+                if (leftObject != null)  moveRectY(leftObject,   -showspeed, levelMenuButtons[0].transform.position.y  > Screen.height * -0.5f);
+                if (rightObject != null) moveRectY(rightObject,  -showspeed, levelMenuButtons[2].transform.position.y  > Screen.height * -0.5f);
+                                         moveRectY(centerObject,  showspeed, levelMenuButtons[1].transform.position.y  < Screen.height *  1.5f);
+                                         moveRectY(panel,        -showspeed, panel.transform.position.y                > Screen.height * -0.5f);
+            }
+        }
+
+        private void updateText () {
+
+            panel.transform.GetChild(0).GetComponent<Text>().text = levelsData[centerIndex].name + '\n' + levelsData[centerIndex].description;
+        }
+
+        // Размер кнопок
+        public void setRectSizeLevels (float xy) {
+            for (int i = 0; i < levelMenuButtons.Count; i++)
+                SetRectSize(levelMenuButtons[i], xy, xy);
+        }
+
+        // Место кнопок в которых они появляются
+        public void setRectTransLevels (float x1, float y1, float x2, float y2, float x3, float y3) {
+            SetRectTransform(levelMenuButtons[0], 0.25f, -0.5f);
+            SetRectTransform(levelMenuButtons[1], 0.5f,   1.5f);
+            SetRectTransform(levelMenuButtons[2], 0.75f, -0.5f);
+            for(int i = 2; i < levelMenuButtons.Count; i++) SetRectTransform(levelMenuButtons[i], 0.75f, -0.5f);
+
+        }
+
+        private void SetRectSize (GameObject go, float sizeX, float sizeY) {
+            RectTransform rt = go.GetComponent(typeof(RectTransform)) as RectTransform;
+            rt.sizeDelta = new Vector2(sizeX, sizeY);
+        }
+        private void SetRectTransform (GameObject go, float screenOffsetX, float screenOffsetY) {
+            go.transform.position = new Vector2(Screen.width * screenOffsetX, Screen.height * screenOffsetY);
+        }
+
+        public void createButtons () {
+            levelsData = levelLoader.getLevels;
+            for (int i = 0; i < levelsData.Count; i++) {
+                levelMenuButtons.Add(Instantiate(buttonPrefab));
+                levelMenuButtons[i].GetComponent<Image>().sprite = Sprite.Create(levelsData[i].icon, new Rect(0, 0, 128, 128), new Vector2(0.2f, 0.2f));
+                levelMenuButtons[i].transform.parent = canvas.transform;
+            }
+
+            leftObject   = levelMenuButtons[0];
+            centerObject = levelMenuButtons[1];
+            rightObject  = levelMenuButtons[2];
+        }
+
+        public LevelsMenu (List<GameObject> levelMenuButtons, LevelLoader levelLoader, GameObject buttonPrefab, GameObject canvas, float showspeed, GameObject panelPrefab) {
+            this.levelMenuButtons = levelMenuButtons;
+            this.levelLoader      = levelLoader;
+            this.buttonPrefab     = buttonPrefab;
+            this.canvas           = canvas;
+            this.showspeed        = showspeed;
+            this.panel            = Instantiate(panelPrefab);
+            panel.transform.parent = canvas.transform;
+            SetRectSize(panel, Screen.width/2, Screen.width/8);
+            SetRectSize(panel.transform.GetChild(0).gameObject, Screen.width / 2, Screen.width / 8);
+            SetRectTransform(panel, 0.5f, -0.5f);
+
+        }
+
+    }
 }
