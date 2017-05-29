@@ -296,7 +296,7 @@ public class MainMenu : MonoBehaviour {
             for (int i = 0; i < levelsData.Count; i++) {
                 levelMenuButtons.Add(Instantiate(buttonPrefab));
                 levelMenuButtons[i].GetComponent<Image>().sprite = Sprite.Create(levelsData[i].icon, new Rect(0, 0, 128, 128), new Vector2(0.2f, 0.2f));
-                levelMenuButtons[i].transform.parent = canvas.transform;
+                levelMenuButtons[i].transform.SetParent(canvas.transform);
             }
 
             leftObject   = levelMenuButtons[0];
@@ -311,7 +311,7 @@ public class MainMenu : MonoBehaviour {
             this.canvas           = canvas;
             this.showspeed        = showspeed;
             this.panel            = Instantiate(panelPrefab);
-            panel.transform.parent = canvas.transform;
+            panel.transform.SetParent(canvas.transform);
             SetRectSize(panel, Screen.width/2, Screen.width/8);
             SetRectSize(panel.transform.GetChild(0).gameObject, Screen.width / 2, Screen.width / 8);
             SetRectTransform(panel, 0.5f, -0.5f);
