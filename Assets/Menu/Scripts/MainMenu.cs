@@ -248,17 +248,24 @@ public class MainMenu : MonoBehaviour {
 
         // Движение из за границ при открытии меню уровней
         public void move () {
+            updateText();
             if (active) {
                 if (leftObject != null)  moveRectY(leftObject,    showspeed, leftObject.transform.position.y   < Screen.height / 2);
                 if (rightObject != null) moveRectY(rightObject,   showspeed, rightObject.transform.position.y  < Screen.height / 2);
                                          moveRectY(centerObject, -showspeed, centerObject.transform.position.y > Screen.height / 2);
-                
+                                         moveRectY(panel,         showspeed, panel.transform.position.y        < Screen.height / 7);
             }
             else {
                 if (leftObject != null)  moveRectY(leftObject,   -showspeed, levelMenuButtons[0].transform.position.y  > Screen.height * -0.5f);
                 if (rightObject != null) moveRectY(rightObject,  -showspeed, levelMenuButtons[2].transform.position.y  > Screen.height * -0.5f);
                                          moveRectY(centerObject,  showspeed, levelMenuButtons[1].transform.position.y  < Screen.height *  1.5f);
+                                         moveRectY(panel,        -showspeed, panel.transform.position.y                > Screen.height * -0.5f);
             }
+        }
+
+        private void updateText () {
+
+            panel.transform.GetChild(0).GetComponent<Text>().text = levelsData[centerIndex].name + '\n' + levelsData[centerIndex].description;
         }
 
         // Размер кнопок
@@ -305,8 +312,9 @@ public class MainMenu : MonoBehaviour {
             this.showspeed        = showspeed;
             this.panel            = Instantiate(panelPrefab);
             panel.transform.parent = canvas.transform;
-            SetRectSize(panel, Screen.width/200, Screen.width/200);
-            SetRectTransform(panel, 0.75f, -0.5f);
+            SetRectSize(panel, Screen.width/2, Screen.width/8);
+            SetRectSize(panel.transform.GetChild(0).gameObject, Screen.width / 2, Screen.width / 8);
+            SetRectTransform(panel, 0.5f, -0.5f);
 
         }
 
