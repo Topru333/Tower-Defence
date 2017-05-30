@@ -19,7 +19,6 @@ namespace TD
         float Radius = 0.5f;   // Радиус NPC
 
         Edge CurrentMovementEdge = null; // Ребро по которому движется NPC
-        Vector2 CurrentMovementDir = Vector2.zero;
         public Texture2D Icon;
         bool isDead = false;
 

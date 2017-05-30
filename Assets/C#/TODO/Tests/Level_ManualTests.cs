@@ -6,11 +6,11 @@ namespace TD.Tests
 {
     public class Level_ManualTests : MonoBehaviour
     {
-        public string name;
+        public string levelname;
         // Use this for initialization
         void Awake()
         {
-            LevelManager.Instance.LevelLoad(name);
+            LevelManager.Instance.LevelLoad(levelname);
         }
 
         // Update is called once per frame

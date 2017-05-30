@@ -33,6 +33,7 @@ namespace TD
         public Sprite icon;
 
         public int GetPrice() { return basePrice; }
+        public int GetSellPrice() { return sellPrice; }
 
         void FixedUpdate()
         {
@@ -108,8 +109,11 @@ namespace TD
         // Повышение уровня
         public void Upgrade()
         {
-            if(upgradeLevel<upgradableParameters.Length)
+            int upgradePrice = (int)(baseUpgradePrice * (1f + priceIncreasePercent*(upgradeLevel+1)));
+            if (upgradeLevel < upgradableParameters.Length - 1&& LevelManager.Instance.CurrentLevel.SpendMoney(upgradePrice))
+            {
                 upgradeLevel++;
+            }
         }
 
         // Обработчик инициализации классов наследников
