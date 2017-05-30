@@ -4,17 +4,24 @@ namespace TD
     // Класс неиграбельных персонажей
     public class NPC : MonoBehaviour
     {
-
+        [SerializeField]
         int Health = 100; // Жизни NPC
-        int PlayerExperience = 10;  // Деньги получаемые игроком при смерти NPC
+        [SerializeField]
+        int PlayerExperience = 10;  // Опыт получаемый игроком при смерти NPC
+        [SerializeField]
+        int GoldGiven = 10;  // Деньги получаемые игроком при смерти NPC
+        [SerializeField]
         int MainTowerDamage = 10;  // Урон, который NPC наносит главной башне по достижении конца пути
 
+        [SerializeField]
         float Speed = 2;   // Скорость передвижения NPC 
+        [SerializeField]
         float Radius = 0.5f;   // Радиус NPC
 
         Edge CurrentMovementEdge = null; // Ребро по которому движется NPC
         Vector2 CurrentMovementDir = Vector2.zero;
         public Texture2D Icon;
+        bool isDead = false;
 
         // Инициализирует основные характеристики NPC
         public virtual void Awake()
@@ -45,7 +52,8 @@ namespace TD
 
             if (CurrentMovementEdge == null)
             {
-                // LevelManager.Instance.CurrentLevel.DamageMainTower(MainTowerDamage); <<<<<<<
+                LevelManager.Instance.CurrentLevel.DamageMainTower(MainTowerDamage);
+                LevelManager.Instance.CurrentLevel.DecreaseNPC_Counter();
 #if DEBUG
                 Debug.Log(string.Format("Отладка:{0}: NPC нанес урон главной башне - {1}.", name, MainTowerDamage));
 #endif
@@ -70,6 +78,7 @@ namespace TD
         {
             if (damagePoints <= 0)
                 throw new System.ArgumentOutOfRangeException();
+            if (isDead) return;
             Health -= damagePoints;
 #if DEBUG
             Debug.Log(string.Format("Отладка:{0}: NPC нанесен урон - {1}, значение жизней - {2}.", name, damagePoints, Health));
@@ -81,11 +90,15 @@ namespace TD
         // Убивает персонажа, дает игроку денег
         void Death()
         {
+            if (isDead) return;
 #if DEBUG
             Debug.Log(string.Format("Отладка:{0}: NPC умер.", name));
 #endif
-            //TODO:Fix shit need review
-            //LevelManager.Instance.CurrentLevel.GiveExperience(PlayerExperience); <<<<<<<
+            isDead = true;
+            var currentLvl = LevelManager.Instance.CurrentLevel;
+            currentLvl.DecreaseNPC_Counter();
+            currentLvl.GiveExperience(PlayerExperience);
+            currentLvl.GiveMoney(GoldGiven);
             Destroy(gameObject);
         }
 

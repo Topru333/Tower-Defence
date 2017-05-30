@@ -2,21 +2,22 @@ leveldescblock
 towerblock
 Tower
 end
-500
-1000
+300
+250
 waveinfoblock
-NPC0 5 2 1
+NPC0 10 1 1
 NPC1 4 1 1
+NPC0 5 1 1
 end
 end
 towergridsystemblock
 4 5 8
 gridblock
-1 0 0 1
+1 0 1 1
 1 0 1 1
 1 0 0 1
 1 1 0 1
-1 1 0 1
+1 1 0 0
 end
 end
 pathsystemblock
