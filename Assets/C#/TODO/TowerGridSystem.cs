@@ -117,6 +117,34 @@ namespace TD
             return true;
         }
 
+        // Возвращает ячейку находящейся в данной позиции в 3х-мерном пространстве.
+        public bool GetTowerCellAt(Vector3 position,out int cellX, out int cellY)
+        {
+            cellX=cellY= 0;
+            int cellID_x = Mathf.FloorToInt((position.x - transform.position.x) / cellSize);
+            int cellID_y = Mathf.FloorToInt((position.z - transform.position.z) / cellSize);
+            if ((cellID_x >= 0 && cellID_x < grid.GetLength(0)) && (cellID_y >= 0 && cellID_y < grid.GetLength(1)))
+            {
+                cellX = cellID_x;cellY= cellID_y;
+                return true;
+            }
+            return false;
+        }
+        // Возвращает ячейку находящейся в данной позиции в 3х-мерном пространстве.
+        public void SellTowerAt(int cellX, int cellY)
+        {
+
+            grid[cellX,cellY].state = CellState.CanBuild;
+            LevelManager.Instance.CurrentLevel.GiveMoney(grid[cellX, cellY].tower.GetSellPrice());
+            Destroy(grid[cellX, cellY].tower.gameObject);
+            grid[cellX, cellY].tower = null;
+        }
+
+        public void UpgradeTowerAt(int cellX, int cellY)
+        {            
+            grid[cellX, cellY].tower.Upgrade();
+        }
+
         private void OnDrawGizmos()
         {
             int m= grid.GetLength(0), n= grid.GetLength(1);
