@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -11,31 +12,34 @@ namespace TD
 #region DragableItem
     public class DragNDropItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
-        public static GameObject movingObject = null;
-        public static bool AllowDragNDrop;
-        public UnityEngine.Events.UnityAction onBeginDragAction;
-        public UnityEngine.Events.UnityAction<PointerEventData> onDragEndAction;
+        public static GameObject MovingObject = null;   // Объект в котором будет находиться копия элемента интерфейса во время перетаскивания
+        public static bool AllowDragNDrop;              // Разрешать перетаскивать элементы интерфейса
+        public UnityAction OnBeginDragAction;                   // Действие вызываемое во время начала перетаскивания
+        public UnityAction<PointerEventData> OnDragProceedAction;   // Действие вызываемое во время перетаскивания
+        public UnityAction<PointerEventData> OnDragEndAction;   // Действие вызываемое после оканчания перетаскивания
+
         public void OnBeginDrag(PointerEventData eventData)
         {
-            if (!movingObject || !AllowDragNDrop)
+            if (!MovingObject || !AllowDragNDrop)
                 return;
-            onBeginDragAction();
-            movingObject.SetActive(true);
+            OnBeginDragAction();
+            MovingObject.SetActive(true);
         }
 
         public void OnDrag(PointerEventData eventData)
         {
-            if (!movingObject || !AllowDragNDrop)
+            if (!MovingObject || !AllowDragNDrop)
                 return;
-            movingObject.transform.position = eventData.position;
+            OnDragProceedAction(eventData);
+            MovingObject.transform.position = eventData.position;
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            if (!movingObject||!AllowDragNDrop)
+            if (!MovingObject || !AllowDragNDrop)
                 return;
-            onDragEndAction(eventData);
-            movingObject.SetActive(false);
+            OnDragEndAction(eventData);
+            MovingObject.SetActive(false);
         }
     }
 #endregion
@@ -56,86 +60,106 @@ namespace TD
                 return _instance;
             }
         }
-        private int selectedTower = 0;
-        private bool inTowerBuildMenu=true;
-        private bool gameIsSpeedUp = false;
-        private bool canShowBuidMenu = false;
-        private bool inPauseMenu = false;
-        private bool levelEnded = false;
-        private bool towerUpgradeSellDialogActive = false;
 
-        public RectTransform towerPanel;
-        public RectTransform towerBuildPanel;
-        public RectTransform pauseMenuPanel;
-        public RectTransform EndLevelDialog;
-        public RectTransform ShowHideTowerBuildMenuImg;
-        public GameObject towerSellUpgradeDialog;
+        private bool    inTowerBuildMenu = true,  // Находится ли пользователь в меню постройки
+                        gameIsSpeedUp   = false,  // Включено ли ускорение игры
+                        canShowBuidMenu = false,  // Можно ли скрыть меню постройки башен
+                        inPauseMenu = false,      // Внутри меню паузы
+                        levelEnded = false,       // Внутри диалога окончания уровня
+                        towerUpgradeSellDialogActive = false;   // Активен ли диалог продажи/прокачки башни
 
-        public Button startWaveSpeedUpButton;
-        public Text ExperienceLabel;
-        public Text WaveNumberLabel;
-        public Text GoldLabel;
-        public Text MainTowerStateLabel;
-        public Text TowerBuildLabel;
-        public Text PauseResumeLabel;
-        public Text StartWaveSpeedUpLabel;
-        public Text EndLevelDialogHeaderLabel;
-        public Image StartWaveSpeedUpImage;
-        public Image PauseResumeImage;
+        public RectTransform TowerPanel;        // Панель постойки башен
+        public RectTransform TowerBuildPanel;   // Панель постойки башен вместе с кнопкой скрытия/показа этой панели
+        public RectTransform PauseMenuPanel;    // Панель меню паузы
+        public RectTransform EndLevelDialog;    // Диалог окончания уровня
+        public RectTransform ShowHideTowerBuildMenuImg; // Изображение скрытия/показа панели постойки башен
+        public GameObject TowerSellUpgradeDialog;   // Кнопка продажи/прокачки башни
 
-        public Sprite ResumeSprite;
-        public Sprite PauseSprite;
-        public Sprite SpeedUpSprite;
-        public Sprite SlowDownSprite;
+        public Button StartWaveSpeedUpButton; // Кнопка начала волны/ускорения игры
+        public Text ExperienceLabel;          // Строка с опытом
+        public Text WaveNumberLabel;          // Строка с номером волны
+        public Text GoldLabel;                // Строка с деньгами
+        public Text MainTowerStateLabel;      // Строка с состоянием уровня
+        //public Text TowerBuildLabel;          
+        //public Text PauseResumeLabel;
+        //public Text StartWaveSpeedUpLabel;
+        public Text EndLevelDialogHeaderLabel;  // Заголовок диалога окончания уровня
+        public Image StartWaveSpeedUpImage;     // Изображение кнопки начала волны/ускорения
+        public Image PauseResumeImage;          // Изображение кнопки паузы
+        public Image SellUpgradeDialogImage;
 
-        private GameObject towerIcon;
+        public Sprite ResumeSprite;     // Спрайт возобновления из паузы
+        public Sprite PauseSprite;      // Спрайт паузы
+        public Sprite SpeedUpSprite;    // Спрайт ускорения игры
+        public Sprite SlowDownSprite;   // Спрайт замедления игры
+
+        public Sprite UpgradeSellMenu_NoneSelected;
+        public Sprite UpgradeSellMenu_SellSelected;
+        public Sprite UpgradeSellMenu_UpgradeSelected;
+
+        private GameObject towerIcon;    
         private List<GameObject> towerButtons=new List<GameObject>();
 
         private float towerPanelUISize;
-        private int waveCount,
-                    mainTowerLifeCount;
+        private int waveCount,          // Общее количество волн на уровне
+                    mainTowerLifeCount, // Общее количество жизней главной башни
+                    selectedTower = 0,  
+                    wavePast = 0;
         [SerializeField]
         private int sellImageSize=50;
-        private int wavePast=0;
         private Vector2 lastMousePos;
         private int currentTowerCellX, currentTowerCellY;
+        private int lastHighlightedCellX=0, lastHighlightedCellY=0;
 
         private void Awake()
         {
             _instance = this;
             var currentLvl = LevelManager.Instance.CurrentLevel;
-            
+            // Заполняем начальные значения
             waveCount               = currentLvl.GetWaveCount();
             mainTowerLifeCount      = currentLvl.GetMainTowerLifeCount();
-            TowerGridSystem.Instance.ToggleGridVizualization();
-            towerPanelUISize = towerPanel.rect.height;
-            GameObject towerButton  = new GameObject("towerbtn");
+            towerPanelUISize        = TowerPanel.rect.height;
+
+            // Создаем пустой перетаскиваемый объект для панели постройки башен
+            GameObject towerButton  = new GameObject("tower_button");
             towerButton.AddComponent<RectTransform>().sizeDelta = new Vector2( towerPanelUISize*0.95f, towerPanelUISize * 0.95f);
-            //towerButton.AddComponent<Button>();
             towerButton.AddComponent<DragNDropItem>();
             towerButton.AddComponent<Image>();
             towerButton.SetActive(false);
-            towerIcon = new GameObject("towerIcon");
+            
+            // Создаем объект-изображение, используемый для перетаскивания башни на уровень
+            towerIcon = new GameObject("tower_icon");
             towerIcon.transform.SetParent(transform);
             towerIcon.AddComponent<RectTransform>().sizeDelta = new Vector2(towerPanelUISize * 0.95f, towerPanelUISize * 0.95f);
             towerIcon.AddComponent<Image>().raycastTarget=false;
             towerIcon.SetActive(false);
+
             int i = 0;
             var towers = currentLvl.GetAvaliableToBuildTowers();
+
+            // Заполняем список доступных для постройки на уровне башен
             foreach (GameObject tower in towers)
             {
-                GameObject go = Instantiate(towerButton);
-                //go.GetComponent<Button>().onClick.AddListener(() => SwitchSelectedTower(go,i-1));
-                go.GetComponent<DragNDropItem>().onBeginDragAction = () => { SwitchSelectedTower(go, i - 1); };
-                go.GetComponent<DragNDropItem>().onDragEndAction = OnTowerDragEnd;
-                go.transform.SetParent(towerPanel.transform);
+                GameObject go = Instantiate(towerButton, TowerPanel.transform);
+
+                var dndItem = go.GetComponent<DragNDropItem>();
+                dndItem.OnBeginDragAction = () => { SwitchSelectedTower(go, i - 1); };
+                dndItem.OnDragEndAction = OnTowerDragEnd;
+                dndItem.OnDragProceedAction = OnTowerDragProceed;
+
                 go.GetComponent<Image>().sprite = tower.GetComponent<Tower>().icon;
                 go.SetActive(true);
+
                 towerButtons.Add(go);
                 i++;
             }
-            DragNDropItem.movingObject = towerIcon;
+
+            DragNDropItem.MovingObject   = towerIcon;
             DragNDropItem.AllowDragNDrop = true;
+            
+            TowerGridSystem.Instance.ToggleGridVizualization();
+            sellImageSize = (int)(Mathf.Min(Screen.width, Screen.height) * 0.15f);
+            TowerSellUpgradeDialog.GetComponent<RectTransform>().sizeDelta = new Vector2(sellImageSize, sellImageSize);
             WaveNumberLabel.text = string.Format("Wave:{0}/{1}", wavePast, waveCount);
         }
 
@@ -143,80 +167,127 @@ namespace TD
         {
             if (inTowerBuildMenu && !inPauseMenu)
             {
+                var pos = GetTouchPos();
+                if (HasTouchBegan())
+                    UpdateSellUpgradeDialogOnBeginTouch(pos);
+                if (HasTouchEnded() && towerUpgradeSellDialogActive)
+                    UpdateSellUpgradeDialogOnEndTouch(pos);
+                if (HasTouchProceed())
+                    UpdateSellUpgradeDialogOnTouchProceed(pos);
+            }
+        }
+
+        // Проверка начато ли нажатие на кнопку мыши/экран
+        private bool HasTouchBegan()
+        {
 #if UNITY_EDITOR
-                if (Input.GetMouseButtonDown(0))
-                {
-                    towerSellUpgradeDialog.transform.position = Input.mousePosition;
-                    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                    RaycastHit rh;
-                    if (Physics.Raycast(ray, out rh))
-                    {
-                        if (TowerGridSystem.Instance.GetTowerCellAt(rh.point,out currentTowerCellX, out currentTowerCellY) && TowerGridSystem.Instance.GetCellInfo(rh.point)== TowerGridSystem.CellState.Builded)
-                        {
-                            towerSellUpgradeDialog.SetActive(true);
-                            lastMousePos = Input.mousePosition;
-                            towerUpgradeSellDialogActive = true;
-                        }
-                    }
-                }
-                if (Input.GetMouseButtonUp(0)&& towerUpgradeSellDialogActive)
-                {
-                    towerSellUpgradeDialog.SetActive(false);
-                    if (Vector2.Distance(Input.mousePosition, lastMousePos) < sellImageSize)
-                    {
-                        if (Input.mousePosition.y - lastMousePos.y > 0)
-                            TowerGridSystem.Instance.SellTowerAt(currentTowerCellX, currentTowerCellY);
-                        else
-                            TowerGridSystem.Instance.UpgradeTowerAt(currentTowerCellX, currentTowerCellY);
-                    }
-                    
-                    towerUpgradeSellDialogActive = false;
-                }
-
-
+            return Input.GetMouseButtonDown(0);
 #else
-                if (Input.touchCount>0&& Input.GetTouch(0).phase== TouchPhase.Began)
-                {
-                    towerSellUpgradeDialog.transform.position = Input.GetTouch(0).position;
-                    Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
-                    RaycastHit rh;
-                    if (Physics.Raycast(ray, out rh))
-                    {
-                        if (TowerGridSystem.Instance.GetTowerCellAt(rh.point, out currentTowerCellX, out currentTowerCellY) && TowerGridSystem.Instance.GetCellInfo(rh.point) == TowerGridSystem.CellState.Builded)
-                        {
-                            towerSellUpgradeDialog.SetActive(true);
-                            lastMousePos = Input.GetTouch(0).position;
-                            towerUpgradeSellDialogActive = true;
-                        }
-                    }
-                }
-                if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Ended && towerUpgradeSellDialogActive)
-                {
-                    towerSellUpgradeDialog.SetActive(false);
-                if (Vector2.Distance(Input.mousePosition, lastMousePos) < sellImageSize)
-                    {
-                    if (Input.GetTouch(0).position.y - lastMousePos.y > 0)
-                        TowerGridSystem.Instance.SellTowerAt(currentTowerCellX, currentTowerCellY);
-                    else
-                        TowerGridSystem.Instance.UpgradeTowerAt(currentTowerCellX, currentTowerCellY);
-                }
-
-                    towerUpgradeSellDialogActive = false;
-                }
+            return Input.touchCount>0 && Input.GetTouch(0).phase== TouchPhase.Began;
 #endif
+        }
+
+        private bool HasTouchProceed()
+        {
+#if UNITY_EDITOR
+            return Input.GetMouseButton(0);
+#else
+            return Input.touchCount>0 && Input.GetTouch(0).phase== TouchPhase.Moved;
+#endif
+        }
+        // Проверка закончено ли нажатие на кнопку мыши/экран
+        private bool HasTouchEnded()
+        {
+#if UNITY_EDITOR
+            return Input.GetMouseButtonUp(0);
+#else
+            return Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Ended;
+#endif
+        }
+        // Возвращает позицию мыши/нажатия
+        private Vector2 GetTouchPos()
+        {
+#if UNITY_EDITOR
+            return Input.mousePosition;
+#else
+            return Input.GetTouch(0).position;
+#endif
+        }
+
+        private void UpdateSellUpgradeDialogOnBeginTouch(Vector2 pos)
+        {
+            TowerSellUpgradeDialog.transform.position = pos;
+            Ray ray = Camera.main.ScreenPointToRay(pos);
+            RaycastHit rh;
+            if (Physics.Raycast(ray, out rh))
+            {
+                if (TowerGridSystem.Instance.GetTowerCellAt(rh.point, out currentTowerCellX, out currentTowerCellY) && TowerGridSystem.Instance.GetCellInfo(rh.point) == TowerGridSystem.CellState.Builded)
+                {
+                    TowerSellUpgradeDialog.SetActive(true);
+                    lastMousePos = pos;
+                    towerUpgradeSellDialogActive = true;
+                }
+            }
+        }
+        
+        private void UpdateSellUpgradeDialogOnEndTouch(Vector2 pos)
+        {
+            TowerSellUpgradeDialog.SetActive(false);
+            float dist = Vector2.Distance(pos, lastMousePos);
+            if (dist < sellImageSize&& dist> sellImageSize * 0.1f)
+            {
+                if (pos.y - lastMousePos.y < 0)
+                    TowerGridSystem.Instance.SellTowerAt(currentTowerCellX, currentTowerCellY);
+                else
+                    TowerGridSystem.Instance.UpgradeTowerAt(currentTowerCellX, currentTowerCellY);
+            }
+
+            towerUpgradeSellDialogActive = false;
+        }
+
+        private void UpdateSellUpgradeDialogOnTouchProceed(Vector2 pos)
+        {
+            float dist = Vector2.Distance(pos, lastMousePos);
+            if (dist < sellImageSize && dist > sellImageSize *0.1f)
+            {
+                if (pos.y - lastMousePos.y < 0)
+                    SellUpgradeDialogImage.sprite = UpgradeSellMenu_SellSelected;
+                else
+                    SellUpgradeDialogImage.sprite = UpgradeSellMenu_UpgradeSelected;
+            }
+            else
+            {
+                SellUpgradeDialogImage.sprite = UpgradeSellMenu_NoneSelected;
+            }
+        }
+
+        private void OnTowerDragProceed(PointerEventData eventData)
+        {
+            Ray ray = Camera.main.ScreenPointToRay(eventData.position);
+            RaycastHit rh;
+            if (Physics.Raycast(ray, out rh))
+            {
+                var towerSystem = TowerGridSystem.Instance;
+                if (towerSystem.GetCellInfo(rh.point)!=TowerGridSystem.CellState.Unknown)           // Если клетка существует то подсвечиваем ее и убираем подсветку с предыдущей
+                {
+                    towerSystem.ResetHighlightOfCell(lastHighlightedCellX, lastHighlightedCellY);
+                    towerSystem.HighlightCell(rh.point, out lastHighlightedCellX, out lastHighlightedCellY);
+                }else towerSystem.ResetHighlightOfCell(lastHighlightedCellX, lastHighlightedCellY);
             }
         }
 
         private void OnTowerDragEnd(PointerEventData eventData) {
+            var towerSystem = TowerGridSystem.Instance;
+            towerSystem.ResetHighlightOfCell(lastHighlightedCellX, lastHighlightedCellY);
             Ray ray = Camera.main.ScreenPointToRay(eventData.position);
             RaycastHit rh;
             var tower = LevelManager.Instance.CurrentLevel.GetAvaliableToBuildTowers()[selectedTower];
             if (Physics.Raycast(ray, out rh))
             {
-                if (TowerGridSystem.Instance.GetCellInfo(rh.point) == TowerGridSystem.CellState.CanBuild)
+                if (towerSystem.GetCellInfo(rh.point) == TowerGridSystem.CellState.CanBuild)
                 {
                     if (LevelManager.Instance.CurrentLevel.SpendMoney(tower.GetComponent<Tower>().GetPrice()))
-                        TowerGridSystem.Instance.BuildTowerAt(rh.point, tower);
+                        towerSystem.BuildTowerAt(rh.point, tower);
                 }
             }
         }
@@ -236,12 +307,12 @@ namespace TD
         // Обновляет строку с золотом
         public void UpdateGold(int gold)
         {
-            GoldLabel.text = string.Format("Gold:{0}", gold);
+            GoldLabel.text = string.Format("{0}", gold);
         }
 
         public void UpdateMainTowerState(int livesLeft)
         {
-            MainTowerStateLabel.text= string.Format("Main Tower State:{0}/{1}", livesLeft, mainTowerLifeCount);
+            MainTowerStateLabel.text= string.Format("{0}/{1}", livesLeft, mainTowerLifeCount);
         }
 
         // Открывает меню паузы
@@ -257,11 +328,11 @@ namespace TD
             DragNDropItem.AllowDragNDrop = !inPauseMenu;
             if (!inTowerBuildMenu)
                 LevelManager.Instance.Pause();
-            pauseMenuPanel.gameObject.SetActive(inPauseMenu);
+            PauseMenuPanel.gameObject.SetActive(inPauseMenu);
             if(!inPauseMenu)
-                pauseMenuPanel.sizeDelta = new Vector2(pauseMenuPanel.sizeDelta.x, pauseMenuPanel.sizeDelta.y);
+                PauseMenuPanel.sizeDelta = new Vector2(PauseMenuPanel.sizeDelta.x, PauseMenuPanel.sizeDelta.y);
             else
-                pauseMenuPanel.sizeDelta = new Vector2(pauseMenuPanel.sizeDelta.x, pauseMenuPanel.sizeDelta.x * 4);
+                PauseMenuPanel.sizeDelta = new Vector2(PauseMenuPanel.sizeDelta.x, PauseMenuPanel.sizeDelta.x * 4);
         }
 
         // Перезапускает уровень, данное действие запускается из меню паузы
@@ -285,9 +356,7 @@ namespace TD
 #if DEBUG
             Debug.Log("Возврат в главное меню.");
 #endif
-            LevelManager.Instance.Pause();
-            if (gameIsSpeedUp)
-                LevelManager.Instance.GameSpeed(1);
+            LevelManager.Instance.GameSpeed(1);
             gameIsSpeedUp = !gameIsSpeedUp;
             
             SceneManager.LoadScene("MainMenu");
@@ -305,8 +374,8 @@ namespace TD
             ToggleTowerBuildMenu();
 
             StartWaveSpeedUpImage.sprite = SpeedUpSprite;
-            startWaveSpeedUpButton.onClick.SetPersistentListenerState(0,UnityEngine.Events.UnityEventCallState.Off);
-            startWaveSpeedUpButton.onClick.AddListener(ToggleSpeedUpMode);
+            StartWaveSpeedUpButton.onClick.SetPersistentListenerState(0,UnityEngine.Events.UnityEventCallState.Off);
+            StartWaveSpeedUpButton.onClick.AddListener(ToggleSpeedUpMode);
             //StartWaveSpeedUpLabel.text = "Speed Up";
         }
 
@@ -339,13 +408,13 @@ namespace TD
             {
                 //TowerBuildLabel.text = "Close";
                 ShowHideTowerBuildMenuImg.rotation = Quaternion.Euler(0, 0, -90);
-                towerBuildPanel.localPosition = new Vector3(towerBuildPanel.localPosition.x, towerBuildPanel.localPosition.y + towerPanelUISize, towerBuildPanel.localPosition.z);
+                TowerBuildPanel.localPosition = new Vector3(TowerBuildPanel.localPosition.x, TowerBuildPanel.localPosition.y + towerPanelUISize, TowerBuildPanel.localPosition.z);
             }
             else
             {
                 ShowHideTowerBuildMenuImg.rotation = Quaternion.Euler(0, 0, 90);
-                TowerBuildLabel.text = "Open";
-                towerBuildPanel.localPosition = new Vector3(towerBuildPanel.localPosition.x, towerBuildPanel.localPosition.y - towerPanelUISize, towerBuildPanel.localPosition.z);
+               // TowerBuildLabel.text = "Open";
+                TowerBuildPanel.localPosition = new Vector3(TowerBuildPanel.localPosition.x, TowerBuildPanel.localPosition.y - towerPanelUISize, TowerBuildPanel.localPosition.z);
             }
         }
 
@@ -354,12 +423,7 @@ namespace TD
             selectedTower = newID;
             towerIcon.GetComponent<Image>().sprite = towerButtons[newID].GetComponent<Image>().sprite;
         }
-
-        // Показывает диалог прокачки/продажи башни
-        public void ShowTowerUpgradeDialog(Vector2 posOnScreen) {
-            // TODO: Реализация
-        }
-
+        
         // Показывает диалог окончания уровня
         public void ShowEndLevelDialog(bool won) {
 #if DEBUG

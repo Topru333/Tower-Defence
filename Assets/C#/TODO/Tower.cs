@@ -26,8 +26,8 @@ namespace TD
         [SerializeField]
         float priceIncreasePercent; // Процент изменения стоимости повышения уровня
         [SerializeField]
-        int   basePrice,            // Цена продажи
-              sellPrice;            // Цена продажи
+        int   basePrice=100,            // Цена продажи
+              sellPrice=100;            // Цена продажи
 
         private float timer;
         public Sprite icon;

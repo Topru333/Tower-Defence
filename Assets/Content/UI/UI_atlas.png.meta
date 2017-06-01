@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: cb998452f19bf934f80cf594e41992eb
-timeCreated: 1496160513
+timeCreated: 1496331548
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -14,6 +14,16 @@ TextureImporter:
     21300014: UI_PlayButton
     21300016: UI_SpeedUpButton
     21300018: UI_SlowDownButton
+    21300020: UI_QuitButton
+    21300022: UI_RetryButton
+    21300024: UI_SellUpgradeMenu
+    21300026: UI_HidePanelButton
+    21300028: UI_GoldIcon
+    21300030: UI_HeartIcon
+    21300032: UI_SellUpgradeMenu_UpgradeSelected
+    21300034: UI_SellUpgradeMenu_SellSelected
+    21300036: UI_SellIcon
+    21300038: UI_UpgradeIcon
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -223,7 +233,7 @@ TextureImporter:
       name: UI_PauseButton
       rect:
         serializedVersion: 2
-        x: 527
+        x: 512
         y: 768
         width: 128
         height: 128
@@ -236,7 +246,7 @@ TextureImporter:
       name: UI_PlayButton
       rect:
         serializedVersion: 2
-        x: 621
+        x: 640
         y: 768
         width: 128
         height: 128
@@ -249,8 +259,8 @@ TextureImporter:
       name: UI_SpeedUpButton
       rect:
         serializedVersion: 2
-        x: 750
-        y: 769
+        x: 768
+        y: 768
         width: 128
         height: 128
       alignment: 0
@@ -262,12 +272,142 @@ TextureImporter:
       name: UI_SlowDownButton
       rect:
         serializedVersion: 2
-        x: 878
-        y: 769
+        x: 896
+        y: 768
         width: 128
         height: 128
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: UI_QuitButton
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 640
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: UI_RetryButton
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 640
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: UI_SellUpgradeMenu
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 640
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: UI_HidePanelButton
+      rect:
+        serializedVersion: 2
+        x: 561
+        y: 670
+        width: 32
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: UI_GoldIcon
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 608
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: UI_HeartIcon
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 608
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: UI_SellUpgradeMenu_UpgradeSelected
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 640
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: UI_SellUpgradeMenu_SellSelected
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 640
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: UI_SellIcon
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 608
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: UI_UpgradeIcon
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 608
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0

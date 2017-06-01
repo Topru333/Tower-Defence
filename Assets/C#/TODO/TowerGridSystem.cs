@@ -40,16 +40,16 @@ namespace TD
         private Canvas canvas;
         private GridLayoutGroup gridLayoutGroup;
         private RawImage[,] cellVisualImages;
-        [SerializeField]
-        private RawImage cellAllowToBuild;
-        [SerializeField]
-        private RawImage cellNotAllowToBuild;
+        //private RawImage cellAllowToBuild;
+        //private RawImage cellNotAllowToBuild;
+        private RawImage cellDefault;
 
         // Use this for initialization
         void Awake()
         {
-            cellAllowToBuild = Resources.Load<RawImage>("Prefabs/CellAllowToBuild");
-            cellNotAllowToBuild = Resources.Load<RawImage>("Prefabs/CellDontAllowToBuild");
+            //cellAllowToBuild = Resources.Load<RawImage>("Prefabs/CellAllowToBuild");
+            //cellNotAllowToBuild = Resources.Load<RawImage>("Prefabs/CellDontAllowToBuild");
+            cellDefault = Resources.Load<RawImage>("Prefabs/CellDefault");
             GameObject go = new GameObject("GridVisualApperance");
             go.transform.SetParent(transform);
             canvas = go.AddComponent<Canvas>();
@@ -89,7 +89,7 @@ namespace TD
             for (j = w-1; j >= 0; j--)
             for (i = 0; i < h; i++)
             {
-                cellVisualImages[i,j] = Instantiate(grid[i,j].state==CellState.CanBuild? cellAllowToBuild:cellNotAllowToBuild, gridLayoutGroup.transform);
+                cellVisualImages[i,j] = Instantiate(cellDefault, gridLayoutGroup.transform);
             }
         }
 
@@ -133,7 +133,6 @@ namespace TD
         // Возвращает ячейку находящейся в данной позиции в 3х-мерном пространстве.
         public void SellTowerAt(int cellX, int cellY)
         {
-
             grid[cellX,cellY].state = CellState.CanBuild;
             LevelManager.Instance.CurrentLevel.GiveMoney(grid[cellX, cellY].tower.GetSellPrice());
             Destroy(grid[cellX, cellY].tower.gameObject);
@@ -159,6 +158,19 @@ namespace TD
             visualizeGrid = !visualizeGrid;
             canvas.gameObject.SetActive(visualizeGrid);
         }
+        // Подсвечивает ячейку
+        public void HighlightCell(Vector3 position, out int x, out int y)
+        {
+            x = y = 0;
+            x = Mathf.FloorToInt((position.x - transform.position.x) / cellSize);
+            y = Mathf.FloorToInt((position.z - transform.position.z) / cellSize);
+            cellVisualImages[x, y].color = grid[x, y].state == CellState.CanBuild ? new Color(0, 1, 0, 0.5f): new Color(1, 0, 0, 0.5f);
+        }
 
+        // Убирает подсветку ячейки
+        public void ResetHighlightOfCell(int x, int y)
+        {
+            cellVisualImages[x, y].color = new Color(1, 1, 1, 0.5f);
+        }
     }
 }
