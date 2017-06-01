@@ -1,25 +1,37 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 namespace TD
 {
     // Класс неиграбельных персонажей
     public class NPC : MonoBehaviour
     {
-
+        [SerializeField]
         int Health = 100; // Жизни NPC
-        int PlayerExperience = 10;  // Деньги получаемые игроком при смерти NPC
+        [SerializeField]
+        int PlayerExperience = 10;  // Опыт получаемый игроком при смерти NPC
+        [SerializeField]
+        int GoldGiven = 10;  // Деньги получаемые игроком при смерти NPC
+        [SerializeField]
         int MainTowerDamage = 10;  // Урон, который NPC наносит главной башне по достижении конца пути
 
+        [SerializeField]
         float Speed = 2;   // Скорость передвижения NPC 
+        [SerializeField]
         float Radius = 0.5f;   // Радиус NPC
+        [SerializeField]
+        bool HasAnimations=false;
+        [SerializeField]
+        Animator Animator = null;
 
         Edge CurrentMovementEdge = null; // Ребро по которому движется NPC
-        Vector2 CurrentMovementDir = Vector2.zero;
         public Texture2D Icon;
+        bool isDead = false;
+        private int deathAnimHash= Animator.StringToHash("Dead");
+        private int hitAnimHash= Animator.StringToHash("Damage");
 
         // Инициализирует основные характеристики NPC
         public virtual void Awake()
         {
-
         }
 
         // Обновление
@@ -45,7 +57,8 @@ namespace TD
 
             if (CurrentMovementEdge == null)
             {
-                // LevelManager.Instance.CurrentLevel.DamageMainTower(MainTowerDamage); <<<<<<<
+                LevelManager.Instance.CurrentLevel.DamageMainTower(MainTowerDamage);
+                LevelManager.Instance.CurrentLevel.DecreaseNPC_Counter();
 #if DEBUG
                 Debug.Log(string.Format("Отладка:{0}: NPC нанес урон главной башне - {1}.", name, MainTowerDamage));
 #endif
@@ -60,7 +73,10 @@ namespace TD
                     outPoint.y = 0;
                     if (Vector3.Distance(transform.position, outPoint) - Radius * 0.4f < 0)
                         CurrentMovementEdge = pathSystem.GetNextEdge(CurrentMovementEdge);
-                    transform.Translate((outPoint - transform.position).normalized * Time.deltaTime * Speed);
+                    Vector3 direction = (outPoint - transform.position).normalized;
+                    transform.rotation= Quaternion.LookRotation(direction);
+
+                    transform.position= transform.position+(direction * Time.deltaTime * Speed);
                 }
             }
         }
@@ -70,7 +86,12 @@ namespace TD
         {
             if (damagePoints <= 0)
                 throw new System.ArgumentOutOfRangeException();
+            if (isDead) return;
             Health -= damagePoints;
+            if (HasAnimations)
+            {
+                Animator.SetTrigger(hitAnimHash);
+            }
 #if DEBUG
             Debug.Log(string.Format("Отладка:{0}: NPC нанесен урон - {1}, значение жизней - {2}.", name, damagePoints, Health));
 #endif
@@ -81,11 +102,25 @@ namespace TD
         // Убивает персонажа, дает игроку денег
         void Death()
         {
+            if (isDead) return;
 #if DEBUG
             Debug.Log(string.Format("Отладка:{0}: NPC умер.", name));
 #endif
-            //TODO:Fix shit need review
-            //LevelManager.Instance.CurrentLevel.GiveExperience(PlayerExperience); <<<<<<<
+            isDead = true;
+            var currentLvl = LevelManager.Instance.CurrentLevel;
+            currentLvl.DecreaseNPC_Counter();
+            currentLvl.GiveExperience(PlayerExperience);
+            currentLvl.GiveMoney(GoldGiven);
+            if (HasAnimations)
+            {
+                Animator.SetTrigger(deathAnimHash);
+            }
+            StartCoroutine("DestroyNPCObject");
+        }
+
+        IEnumerator DestroyNPCObject()
+        {
+            yield return new WaitForSeconds(2f);
             Destroy(gameObject);
         }
 

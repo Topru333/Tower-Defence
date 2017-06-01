@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System;
+
 namespace TD
 {
     public class Tower : MonoBehaviour
     {
-
-        // TODO: Сделать списком. Так же добавить загрузку из потока
+        
+        [SerializeField]
         UpgradableParams[] upgradableParameters = new UpgradableParams[]{new UpgradableParams() {
             targetListUpdateFreq = 3f,
             TowerDamage=15,
@@ -16,16 +18,22 @@ namespace TD
         } }; // Список улучшаемых параметров
         List<Transform> targetList=new List<Transform>();            // Список целей
 
-        uint upgradeLevel,          // Уровень башни
-             maxUpgradeLevel=1;       // Максимальный уровень башни
+        
+        uint upgradeLevel;          // Уровень башни
 
-        float baseUpgradePrice,     // Начальная стоимость повышения уровня
-              priceIncreasePercent, // Процент изменения стоимости повышения уровня
-              timer,                // Для проверки частоты удара
-              basePrice,            // Цена продажи
-              sellPrice;            // Цена покупки
+        [SerializeField]
+        int baseUpgradePrice;     // Начальная стоимость повышения уровня
+        [SerializeField]
+        float priceIncreasePercent; // Процент изменения стоимости повышения уровня
+        [SerializeField]
+        int   basePrice=100,            // Цена продажи
+              sellPrice=100;            // Цена продажи
+
+        private float timer;
         public Sprite icon;
-        public LayerMask lm;
+
+        public int GetPrice() { return basePrice; }
+        public int GetSellPrice() { return sellPrice; }
 
         void FixedUpdate()
         {
@@ -40,8 +48,6 @@ namespace TD
         // Инициализация
         void Awake()
         {
-            for(int i=0;i<maxUpgradeLevel;i++)
-                upgradableParameters[i].targetsMask = lm;
             StartCoroutine("FindTargetsWithDelay", upgradableParameters[upgradeLevel].targetListUpdateFreq);
         }
 
@@ -103,8 +109,11 @@ namespace TD
         // Повышение уровня
         public void Upgrade()
         {
-            if(upgradeLevel<maxUpgradeLevel)
+            int upgradePrice = (int)(baseUpgradePrice * (1f + priceIncreasePercent*(upgradeLevel+1)));
+            if (upgradeLevel < upgradableParameters.Length - 1&& LevelManager.Instance.CurrentLevel.SpendMoney(upgradePrice))
+            {
                 upgradeLevel++;
+            }
         }
 
         // Обработчик инициализации классов наследников
@@ -138,7 +147,7 @@ namespace TD
             return new Vector3(Mathf.Sin(Mathf.Deg2Rad * angleInDegrees), 0, Mathf.Cos(angleInDegrees * Mathf.Deg2Rad));
         }
     }
-
+    [Serializable]
     public class UpgradableParams
     {
         public LayerMask targetsMask,       // Возможные цели
