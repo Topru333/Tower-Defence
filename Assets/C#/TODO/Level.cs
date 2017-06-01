@@ -17,6 +17,7 @@ namespace TD
         private float timer = 0;
         private bool waveStarted = false;
         private int currentWaveNPC_counter=0;
+        private bool levelEnded=false;
         public string level_name;
 
         public void Load(StreamReader sr)
@@ -78,8 +79,11 @@ namespace TD
                 }
                 timer -= Time.deltaTime;
             }
-            else if (currentWaveNPC_counter <= 0)
+            else if (currentWaveNPC_counter <= 0&& !levelEnded)
+            {
+                levelEnded = true;
                 ingameUI.ShowEndLevelDialog(true);
+            }
             ingameUI.UpdateExperince(experience);
             ingameUI.UpdateGold(money);
             ingameUI.UpdateMainTowerState(mainTowerLifeCount);

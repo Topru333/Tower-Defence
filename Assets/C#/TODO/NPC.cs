@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 namespace TD
 {
     // Класс неиграбельных персонажей
@@ -17,15 +18,20 @@ namespace TD
         float Speed = 2;   // Скорость передвижения NPC 
         [SerializeField]
         float Radius = 0.5f;   // Радиус NPC
+        [SerializeField]
+        bool HasAnimations=false;
+        [SerializeField]
+        Animator Animator = null;
 
         Edge CurrentMovementEdge = null; // Ребро по которому движется NPC
         public Texture2D Icon;
         bool isDead = false;
+        private int deathAnimHash= Animator.StringToHash("Dead");
+        private int hitAnimHash= Animator.StringToHash("Damage");
 
         // Инициализирует основные характеристики NPC
         public virtual void Awake()
         {
-
         }
 
         // Обновление
@@ -67,7 +73,10 @@ namespace TD
                     outPoint.y = 0;
                     if (Vector3.Distance(transform.position, outPoint) - Radius * 0.4f < 0)
                         CurrentMovementEdge = pathSystem.GetNextEdge(CurrentMovementEdge);
-                    transform.Translate((outPoint - transform.position).normalized * Time.deltaTime * Speed);
+                    Vector3 direction = (outPoint - transform.position).normalized;
+                    transform.rotation= Quaternion.LookRotation(direction);
+
+                    transform.position= transform.position+(direction * Time.deltaTime * Speed);
                 }
             }
         }
@@ -79,6 +88,10 @@ namespace TD
                 throw new System.ArgumentOutOfRangeException();
             if (isDead) return;
             Health -= damagePoints;
+            if (HasAnimations)
+            {
+                Animator.SetTrigger(hitAnimHash);
+            }
 #if DEBUG
             Debug.Log(string.Format("Отладка:{0}: NPC нанесен урон - {1}, значение жизней - {2}.", name, damagePoints, Health));
 #endif
@@ -98,6 +111,16 @@ namespace TD
             currentLvl.DecreaseNPC_Counter();
             currentLvl.GiveExperience(PlayerExperience);
             currentLvl.GiveMoney(GoldGiven);
+            if (HasAnimations)
+            {
+                Animator.SetTrigger(deathAnimHash);
+            }
+            StartCoroutine("DestroyNPCObject");
+        }
+
+        IEnumerator DestroyNPCObject()
+        {
+            yield return new WaitForSeconds(2f);
             Destroy(gameObject);
         }
 
