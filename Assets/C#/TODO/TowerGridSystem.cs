@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace TD
 {
-    public class TowerGridSystem : MonoBehaviour
+    public class TowerGridSystem : Singleton<TowerGridSystem>
     {
         public enum CellState
         {
@@ -19,20 +19,6 @@ namespace TD
         {
             public CellState state;
             public Tower tower;
-        }
-        private static TowerGridSystem _instance;
-        public static TowerGridSystem Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    GameObject singleton = new GameObject();
-                    _instance = singleton.AddComponent<TowerGridSystem>();
-                    singleton.name = typeof(TowerGridSystem).ToString();
-                }
-                return _instance;
-            }
         }
         private TowerCell[,] grid;
         private float cellSize = 1;
@@ -171,6 +157,17 @@ namespace TD
         public void ResetHighlightOfCell(int x, int y)
         {
             cellVisualImages[x, y].color = new Color(1, 1, 1, 0.5f);
+        }
+
+        public void GetBBox(out Vector3 a, out Vector3 b, out Vector3 c, out Vector3 d)
+        {
+            float width  = grid.GetLength(0) * cellSize, 
+                  height = grid.GetLength(1) * cellSize;
+
+            a = new Vector3(transform.position.x, 0, transform.position.z);
+            b = new Vector3(transform.position.x + width, 0, transform.position.z);
+            c = new Vector3(transform.position.x, 0, transform.position.z+height);
+            d = new Vector3(transform.position.x + width, 0, transform.position.z+height);
         }
     }
 }
