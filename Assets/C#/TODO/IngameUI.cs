@@ -44,22 +44,8 @@ namespace TD
     }
 #endregion
 
-    public class IngameUI : MonoBehaviour
+    public class IngameUI : Singleton<IngameUI>
     {
-        private static IngameUI _instance;
-        public static IngameUI Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    GameObject singleton = new GameObject();
-                    _instance = singleton.AddComponent<IngameUI>();
-                    singleton.name = typeof(IngameUI).ToString();
-                }
-                return _instance;
-            }
-        }
 
         private bool    inTowerBuildMenu = true,  // Находится ли пользователь в меню постройки
                         gameIsSpeedUp   = false,  // Включено ли ускорение игры
