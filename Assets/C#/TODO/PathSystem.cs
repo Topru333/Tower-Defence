@@ -4,22 +4,8 @@ using UnityEngine;
 using System;
 namespace TD
 {
-    public class PathSystem : MonoBehaviour
+    public class PathSystem : Singleton<PathSystem>
     {
-        private static PathSystem _instance;
-        public static PathSystem Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    GameObject singleton = new GameObject();
-                    _instance = singleton.AddComponent<PathSystem>();
-                    singleton.name = typeof(PathSystem).ToString();
-                }
-                return _instance;
-            }
-        }
 
         public int Start_id;                                                            // Айди стартовой точки для спавна нпс
 

@@ -5,22 +5,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 namespace TD
 {
-    public class LevelManager : MonoBehaviour
+    public class LevelManager : Singleton<LevelManager>
     {
-        private static LevelManager _instance;
-        public static LevelManager Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    GameObject singleton = new GameObject();
-                    _instance = singleton.AddComponent<LevelManager>();
-                    singleton.name = typeof(LevelManager).ToString();
-                }
-                return _instance;
-            }
-        }
 
         private Dictionary<string, GameObject> base_towers = new Dictionary<string, GameObject>();    // Список башен доступных для постройки
         private Dictionary<string, GameObject> base_npcs   = new Dictionary<string, GameObject>();    // Список башен доступных для постройки

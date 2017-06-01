@@ -101,11 +101,12 @@ namespace TD
             NpcWave npcWave = waves.Pop();
             waveStarted = true;
             timer = npcWave.count * npcWave.delay+20;
-            currentWaveNPC_counter = npcWave.count;
+            currentWaveNPC_counter += npcWave.count;
             PathSystem.Instance.NPCSpawn(npcWave);
         }
         public void DecreaseNPC_Counter() {
-            currentWaveNPC_counter--;
+            if(currentWaveNPC_counter>0)
+                currentWaveNPC_counter--;
         }
 
         // Наносит урон главной башне
