@@ -29,7 +29,7 @@ public class MainMenu : MonoBehaviour {
     public GameObject prefabLevel            = null; // Префаб кнопки уровня
     public GameObject prefabDescriptionLevel = null; // Префаб панельки с описанием уровня
     public GameObject backButton             = null; // Кнопка возврата в гл. меню
-
+    public GameObject background             = null; // Задняя картинка меню
 
 
     // Use this for initialization
@@ -84,6 +84,7 @@ public class MainMenu : MonoBehaviour {
         SetRectTransform(rusLenguage,  1.5f, 0.25f);
         SetRectTransform(engLenguage,  1.5f, 0.25f);
 
+        background.transform.SetParent(canvas.transform);
     }
 
     private void SetRectSize(GameObject go,float sizeX, float sizeY)
@@ -295,13 +296,14 @@ public class MainMenu : MonoBehaviour {
             levelsData = levelLoader.getLevels;
             for (int i = 0; i < levelsData.Count; i++) {
                 levelMenuButtons.Add(Instantiate(buttonPrefab));
-                levelMenuButtons[i].GetComponent<Image>().sprite = Sprite.Create(levelsData[i].icon, new Rect(0, 0, 128, 128), new Vector2(0.2f, 0.2f));
+                levelMenuButtons[i].GetComponent<Image>().sprite = Sprite.Create(levelsData[i].icon, new Rect(0, 0, 64, 64), new Vector2(0.2f, 0.2f));
                 levelMenuButtons[i].transform.SetParent(canvas.transform);
             }
 
             leftObject   = levelMenuButtons[0];
             centerObject = levelMenuButtons[1];
             rightObject  = levelMenuButtons[2];
+            
         }
 
         public LevelsMenu (List<GameObject> levelMenuButtons, LevelLoader levelLoader, GameObject buttonPrefab, GameObject canvas, float showspeed, GameObject panelPrefab) {
