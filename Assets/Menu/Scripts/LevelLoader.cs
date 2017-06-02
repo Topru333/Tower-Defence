@@ -15,8 +15,9 @@ public class LevelLoader : MonoBehaviour {
     }
     // «Инициализация»
     public void Awake () {
-        Stream objectListStream = File.OpenRead(Application.dataPath + "/Resources/levelslist.txt");
-        using (StreamReader sr = new StreamReader(objectListStream)) {
+        TextAsset levelList = Resources.Load<TextAsset>("levelslist");
+        Stream levelListStream = new MemoryStream(levelList.bytes);
+        using (StreamReader sr = new StreamReader(levelListStream)) {
             loadLevelIcons(sr);
         }
     }
