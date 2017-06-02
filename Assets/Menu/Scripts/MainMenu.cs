@@ -298,7 +298,7 @@ public class MainMenu : MonoBehaviour {
                 levelMenuButtons.Add(Instantiate(buttonPrefab));
                 string _name = levelsData[i].name;
                 levelMenuButtons[i].GetComponent<Button>().onClick.AddListener(() => { SceneManager.LoadScene(_name); });
-                levelMenuButtons[i].transform.GetChild(0).GetComponent<Image>().sprite = Sprite.Create(levelsData[i].icon, new Rect(0, 0, 128, 128), new Vector2(0.2f, 0.2f));
+                levelMenuButtons[i].transform.GetChild(0).GetComponent<Image>().sprite = Sprite.Create(levelsData[i].icon, new Rect(0, 0, levelsData[i].icon.width, levelsData[i].icon.height), new Vector2(0.2f, 0.2f));
                 levelMenuButtons[i].transform.GetChild(1).GetComponent<Text>().text = levelsData[i].description;
                 levelMenuButtons[i].transform.SetParent(canvas.transform);
             }
