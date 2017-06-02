@@ -8,7 +8,10 @@ namespace TD
 {
     public class Tower : MonoBehaviour
     {
-        
+        private LineRenderer gunLine;         // Ссылка на прорисовку лайна встрела
+        [Range(0.1f, 1f)]
+        public float effectsDisplayTime;     // Время показа эффекта выстрела.
+
         [SerializeField]
         UpgradableParams[] upgradableParameters = new UpgradableParams[]{new UpgradableParams() {
             targetListUpdateFreq = 3f,
@@ -49,6 +52,7 @@ namespace TD
         void Awake()
         {
             StartCoroutine("FindTargetsWithDelay", upgradableParameters[upgradeLevel].targetListUpdateFreq);
+            gunLine = gameObject.GetComponent<LineRenderer>();
         }
 
         // Обновление
@@ -65,6 +69,13 @@ namespace TD
                 yield return new WaitForSeconds(delay);
                 TargetSearch();
                 timer += delay;
+            }
+        }
+        // Поиск цели с в промежуток времени
+        IEnumerator EffectCloseWithDelay (float delay) {
+            while (true) {
+                yield return new WaitForSeconds(delay);
+                gunLine.enabled = false;
             }
         }
 
@@ -102,6 +113,10 @@ namespace TD
                 {
                     NPC npc = targetList[i].gameObject.GetComponent<NPC>();
                     npc.DoDamage(upgradableParameters[upgradeLevel].TowerDamage);
+                    gunLine.enabled = true;
+                    gunLine.SetPosition(0, new Vector3(transform.position.x,transform.position.y + 6,transform.position.z));
+                    gunLine.SetPosition(1, targetList[i].position);
+                    StartCoroutine("EffectCloseWithDelay", effectsDisplayTime);
                 }
             }
         }
@@ -119,6 +134,11 @@ namespace TD
         // Обработчик инициализации классов наследников
         public virtual void Init()
         {
+
+        }
+
+        // Отключение визуализации спецэффектов
+        public void DisableEffects () {
 
         }
 
