@@ -1,5 +1,5 @@
 Levels
-testlevel1#hello boys and girls, welcome to test level 1!#Textures/facebook
-testlevel2#hello boys and girls, welcome to test level 2!#Textures/twitter
-testlevel3#hello boys and girls, welcome to test level 3!#Textures/Topru
+testlevel1#hello boys and girls, welcome to test level !#Textures/facebook
+testlevel2#hello boys and girls, welcome to test level !#Textures/twitter
+testlevel3#hello boys and girls, welcome to test level !#Textures/Topru
 end
