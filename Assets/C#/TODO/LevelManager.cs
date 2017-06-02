@@ -122,11 +122,13 @@ namespace TD
         // Переход в режим "пауза"(и обратно)
         public void Pause()
         {
-            pause = !pause;
-            if(pause)
-                Time.timeScale = 0;
-            else
-                Time.timeScale = gameSpeed;
+            pause = true;
+            Time.timeScale = 0;
+        }
+        public void Resume()
+        {
+            pause = false;
+            Time.timeScale = gameSpeed;
         }
 
         // Метод завершения уровня

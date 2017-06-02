@@ -35,6 +35,7 @@ namespace TD
         {
             //cellAllowToBuild = Resources.Load<RawImage>("Prefabs/CellAllowToBuild");
             //cellNotAllowToBuild = Resources.Load<RawImage>("Prefabs/CellDontAllowToBuild");
+            transform.position = new Vector3(transform.position.x, transform.position.y + 1.5f, transform.position.z);
             cellDefault = Resources.Load<RawImage>("Prefabs/CellDefault");
             GameObject go = new GameObject("GridVisualApperance");
             go.transform.SetParent(transform);
@@ -70,7 +71,7 @@ namespace TD
             gridLayoutGroup.cellSize = new Vector2(cellSize, cellSize);
             canvas.GetComponent<RectTransform>().sizeDelta = new Vector2(cellSize * h, cellSize * w);
 
-            gridLayoutGroup.transform.SetPositionAndRotation(new Vector3(cellSize*h/2,0.5f,cellSize*w/2), Quaternion.Euler(90,0,0));
+            gridLayoutGroup.transform.SetPositionAndRotation(new Vector3(cellSize*h/2,transform.position.y,cellSize*w/2), Quaternion.Euler(90,0,0));
             cellVisualImages = new RawImage[h,w];
             for (j = w-1; j >= 0; j--)
             for (i = 0; i < h; i++)

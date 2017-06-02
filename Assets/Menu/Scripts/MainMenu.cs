@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour {
@@ -248,25 +249,25 @@ public class MainMenu : MonoBehaviour {
 
         // Движение из за границ при открытии меню уровней
         public void move () {
-            updateText();
+            //updateText();
             if (active) {
                 if (leftObject != null)  moveRectY(leftObject,    showspeed, leftObject.transform.position.y   < Screen.height / 2);
                 if (rightObject != null) moveRectY(rightObject,   showspeed, rightObject.transform.position.y  < Screen.height / 2);
                                          moveRectY(centerObject, -showspeed, centerObject.transform.position.y > Screen.height / 2);
-                                         moveRectY(panel,         showspeed, panel.transform.position.y        < Screen.height / 7);
+                                         //moveRectY(panel,         showspeed, panel.transform.position.y        < Screen.height / 7);
             }
             else {
                 if (leftObject != null)  moveRectY(leftObject,   -showspeed, levelMenuButtons[0].transform.position.y  > Screen.height * -0.5f);
                 if (rightObject != null) moveRectY(rightObject,  -showspeed, levelMenuButtons[2].transform.position.y  > Screen.height * -0.5f);
                                          moveRectY(centerObject,  showspeed, levelMenuButtons[1].transform.position.y  < Screen.height *  1.5f);
-                                         moveRectY(panel,        -showspeed, panel.transform.position.y                > Screen.height * -0.5f);
+                                         //moveRectY(panel,        -showspeed, panel.transform.position.y                > Screen.height * -0.5f);
             }
         }
-
+/*
         private void updateText () {
 
             panel.transform.GetChild(0).GetComponent<Text>().text = levelsData[centerIndex].name + '\n' + levelsData[centerIndex].description;
-        }
+        }*/
 
         // Размер кнопок
         public void setRectSizeLevels (float xy) {
@@ -295,7 +296,10 @@ public class MainMenu : MonoBehaviour {
             levelsData = levelLoader.getLevels;
             for (int i = 0; i < levelsData.Count; i++) {
                 levelMenuButtons.Add(Instantiate(buttonPrefab));
-                levelMenuButtons[i].GetComponent<Image>().sprite = Sprite.Create(levelsData[i].icon, new Rect(0, 0, 128, 128), new Vector2(0.2f, 0.2f));
+                string _name = levelsData[i].name;
+                levelMenuButtons[i].GetComponent<Button>().onClick.AddListener(() => { SceneManager.LoadScene(_name); });
+                levelMenuButtons[i].transform.GetChild(0).GetComponent<Image>().sprite = Sprite.Create(levelsData[i].icon, new Rect(0, 0, 128, 128), new Vector2(0.2f, 0.2f));
+                levelMenuButtons[i].transform.GetChild(1).GetComponent<Text>().text = levelsData[i].description;
                 levelMenuButtons[i].transform.SetParent(canvas.transform);
             }
 
@@ -310,12 +314,12 @@ public class MainMenu : MonoBehaviour {
             this.buttonPrefab     = buttonPrefab;
             this.canvas           = canvas;
             this.showspeed        = showspeed;
-            this.panel            = Instantiate(panelPrefab);
-            panel.transform.SetParent(canvas.transform);
-            SetRectSize(panel, Screen.width/2, Screen.width/8);
+            //this.panel            = Instantiate(panelPrefab);
+            //panel.transform.SetParent(canvas.transform);
+           /* SetRectSize(panel, Screen.width/2, Screen.width/8);
             SetRectSize(panel.transform.GetChild(0).gameObject, Screen.width / 2, Screen.width / 8);
             SetRectTransform(panel, 0.5f, -0.5f);
-
+            */
         }
 
     }
