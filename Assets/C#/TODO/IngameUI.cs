@@ -47,41 +47,71 @@ namespace TD
     public class IngameUI : Singleton<IngameUI>
     {
 
-        private bool    inTowerBuildMenu = true,  // Находится ли пользователь в меню постройки
-                        gameIsSpeedUp   = false,  // Включено ли ускорение игры
+        private bool inTowerBuildMenu = true,  // Находится ли пользователь в меню постройки
+                        gameIsSpeedUp = false,  // Включено ли ускорение игры
                         canShowBuidMenu = false,  // Можно ли скрыть меню постройки башен
                         inPauseMenu = false,      // Внутри меню паузы
                         levelEnded = false,       // Внутри диалога окончания уровня
-                        towerUpgradeSellDialogActive = false;   // Активен ли диалог продажи/прокачки башни
+                        towerUpgradeSellDialogActive = false,   // Активен ли диалог продажи/прокачки башни
+                        inTutorialMessage=false;
+        [SerializeField]
+        private RectTransform TowerPanel;        // Панель постойки башен
+        [SerializeField]
+        private RectTransform TowerBuildPanel;   // Панель постойки башен вместе с кнопкой скрытия/показа этой панели
+        [SerializeField]
+        private RectTransform PauseMenuPanel;    // Панель меню паузы
+        [SerializeField]
+        private RectTransform EndLevelDialog;    // Диалог окончания уровня
+        [SerializeField]
+        private RectTransform ShowHideTowerBuildMenuImg; // Изображение скрытия/показа панели постойки башен
+        [SerializeField]
+        private GameObject TowerSellUpgradeDialog;   // Кнопка продажи/прокачки башни
+        [SerializeField]
+        private GameObject TutorialDialog;  // Диалоговое окно обучающего уровня
 
-        public RectTransform TowerPanel;        // Панель постойки башен
-        public RectTransform TowerBuildPanel;   // Панель постойки башен вместе с кнопкой скрытия/показа этой панели
-        public RectTransform PauseMenuPanel;    // Панель меню паузы
-        public RectTransform EndLevelDialog;    // Диалог окончания уровня
-        public RectTransform ShowHideTowerBuildMenuImg; // Изображение скрытия/показа панели постойки башен
-        public GameObject TowerSellUpgradeDialog;   // Кнопка продажи/прокачки башни
+        [SerializeField]
+        private Button StartWaveSpeedUpButton; // Кнопка начала волны/ускорения игры
+        [SerializeField]
+        private Text ExperienceLabel;          // Строка с опытом
+        [SerializeField]
+        private Text WaveNumberLabel;          // Строка с номером волны
+        [SerializeField]
+        private Text GoldLabel;                // Строка с деньгами
+        [SerializeField]
+        private Text MainTowerStateLabel;      // Строка с состоянием уровня
+        [SerializeField]
+        private Text TutorialDialogLabel;      // Строка с состоянием уровня
 
-        public Button StartWaveSpeedUpButton; // Кнопка начала волны/ускорения игры
-        public Text ExperienceLabel;          // Строка с опытом
-        public Text WaveNumberLabel;          // Строка с номером волны
-        public Text GoldLabel;                // Строка с деньгами
-        public Text MainTowerStateLabel;      // Строка с состоянием уровня
-        //public Text TowerBuildLabel;          
-        //public Text PauseResumeLabel;
-        //public Text StartWaveSpeedUpLabel;
-        public Text EndLevelDialogHeaderLabel;  // Заголовок диалога окончания уровня
-        public Image StartWaveSpeedUpImage;     // Изображение кнопки начала волны/ускорения
-        public Image PauseResumeImage;          // Изображение кнопки паузы
-        public Image SellUpgradeDialogImage;
+        [SerializeField]
+        private Text EndLevelDialogHeaderLabel;  // Заголовок диалога окончания уровня
+        [SerializeField]
+        private Image StartWaveSpeedUpImage;     // Изображение кнопки начала волны/ускорения
+        [SerializeField]
+        private Image PauseResumeImage;          // Изображение кнопки паузы
+        [SerializeField]
+        private Image SellUpgradeDialogImage;
+        [SerializeField]
+        private RawImage Star1;
+        [SerializeField]
+        private RawImage Star2;
+        [SerializeField]
+        private RawImage Star3;
 
-        public Sprite ResumeSprite;     // Спрайт возобновления из паузы
-        public Sprite PauseSprite;      // Спрайт паузы
-        public Sprite SpeedUpSprite;    // Спрайт ускорения игры
-        public Sprite SlowDownSprite;   // Спрайт замедления игры
+        [SerializeField]
+        private Sprite ResumeSprite;     // Спрайт возобновления из паузы
+        [SerializeField]
+        private Sprite PauseSprite;      // Спрайт паузы
+        [SerializeField]
+        private Sprite SpeedUpSprite;    // Спрайт ускорения игры
+        [SerializeField]
+        private Sprite SlowDownSprite;   // Спрайт замедления игры
 
-        public Sprite UpgradeSellMenu_NoneSelected;
-        public Sprite UpgradeSellMenu_SellSelected;
-        public Sprite UpgradeSellMenu_UpgradeSelected;
+        [SerializeField]
+        private Sprite UpgradeSellMenu_NoneSelected;
+        [SerializeField]
+        private Sprite UpgradeSellMenu_SellSelected;
+        [SerializeField]
+        private Sprite UpgradeSellMenu_UpgradeSelected;
 
         private GameObject towerIcon;    
         private List<GameObject> towerButtons=new List<GameObject>();
@@ -96,6 +126,17 @@ namespace TD
         private Vector2 lastMousePos;
         private int currentTowerCellX, currentTowerCellY;
         private int lastHighlightedCellX=0, lastHighlightedCellY=0;
+        public bool HasBuiltTower
+        {
+            get;
+            private set;
+        }
+        public bool IsInDefenseMode
+        {
+            get;
+            private set;
+        }
+
 
         private void Awake()
         {
@@ -147,6 +188,7 @@ namespace TD
             sellImageSize = (int)(Mathf.Min(Screen.width, Screen.height) * 0.15f);
             TowerSellUpgradeDialog.GetComponent<RectTransform>().sizeDelta = new Vector2(sellImageSize, sellImageSize);
             WaveNumberLabel.text = string.Format("Wave:{0}/{1}", wavePast, waveCount);
+            HasBuiltTower = IsInDefenseMode = false;
         }
 
         private void Update()
@@ -273,7 +315,10 @@ namespace TD
                 if (towerSystem.GetCellInfo(rh.point) == TowerGridSystem.CellState.CanBuild)
                 {
                     if (LevelManager.Instance.CurrentLevel.SpendMoney(tower.GetComponent<Tower>().GetPrice()))
+                    {
                         towerSystem.BuildTowerAt(rh.point, tower);
+                        HasBuiltTower = true;
+                    }
                 }
             }
         }
@@ -304,7 +349,7 @@ namespace TD
         // Открывает меню паузы
         public void TogglePauseMenu()
         {
-            if (levelEnded)
+            if (levelEnded|| inTutorialMessage)
                 return;
 #if DEBUG
             Debug.Log("Открыто меню паузы.");
@@ -313,7 +358,12 @@ namespace TD
             PauseResumeImage.sprite = inPauseMenu ? ResumeSprite : PauseSprite;
             DragNDropItem.AllowDragNDrop = !inPauseMenu;
             if (!inTowerBuildMenu)
-                LevelManager.Instance.Pause();
+            {
+                if(inPauseMenu)
+                    LevelManager.Instance.Pause();
+                else
+                    LevelManager.Instance.Resume();
+            }
             PauseMenuPanel.gameObject.SetActive(inPauseMenu);
             if(!inPauseMenu)
                 PauseMenuPanel.sizeDelta = new Vector2(PauseMenuPanel.sizeDelta.x, PauseMenuPanel.sizeDelta.y);
@@ -330,7 +380,6 @@ namespace TD
         }
 
         // Показывает меню настроек, данная кнопка запускается из меню паузы
-        // TODO: Сделать меню настроек
         public void ShowSettingsMenu() {
 #if DEBUG
             Debug.Log("Открыто меню настроек.");
@@ -342,9 +391,9 @@ namespace TD
 #if DEBUG
             Debug.Log("Возврат в главное меню.");
 #endif
-            LevelManager.Instance.GameSpeed(1);
-            gameIsSpeedUp = !gameIsSpeedUp;
-            
+            if(gameIsSpeedUp)
+                ToggleSpeedUpMode();
+            LevelManager.Instance.Resume();
             SceneManager.LoadScene("MainMenu");
         }
 
@@ -353,7 +402,7 @@ namespace TD
 #if DEBUG
             Debug.Log("Вызвана волна NPC.");
 #endif
-            if (inPauseMenu)
+            if (inPauseMenu|| inTutorialMessage)
                 return;
             LevelManager.Instance.CurrentLevel.WaveStart();
             canShowBuidMenu = true;
@@ -362,48 +411,50 @@ namespace TD
             StartWaveSpeedUpImage.sprite = SpeedUpSprite;
             StartWaveSpeedUpButton.onClick.SetPersistentListenerState(0,UnityEngine.Events.UnityEventCallState.Off);
             StartWaveSpeedUpButton.onClick.AddListener(ToggleSpeedUpMode);
-            //StartWaveSpeedUpLabel.text = "Speed Up";
+            StartCoroutine("SetDefenseModeOn"); 
         }
-
+        IEnumerator SetDefenseModeOn() {
+            yield return new WaitForSeconds(3); IsInDefenseMode = true;
+        }
         // Ускоряет/Замедляет игру
         public void ToggleSpeedUpMode() {
 #if DEBUG
             Debug.Log("Скорость игры изменена.");
 #endif
-            if (inTowerBuildMenu||inPauseMenu|| levelEnded)
+            if (inTowerBuildMenu||inPauseMenu|| levelEnded|| inTutorialMessage)
                 return;
             gameIsSpeedUp = !gameIsSpeedUp;
             StartWaveSpeedUpImage.sprite = gameIsSpeedUp ? SlowDownSprite : SpeedUpSprite;
-            /*if (gameIsSpeedUp)
-                StartWaveSpeedUpLabel.text = "Slow Down";
-            else
-                StartWaveSpeedUpLabel.text = "Speed Up";*/
             LevelManager.Instance.GameSpeed(gameIsSpeedUp?5:1);
         }
 
         // Скрывает/Показывает меню постройки башен
         public void ToggleTowerBuildMenu() {
-            if (!canShowBuidMenu || inPauseMenu|| levelEnded)
+            if (!canShowBuidMenu || inPauseMenu|| levelEnded|| inTutorialMessage)
                 return;
-            if(!inPauseMenu)
-                LevelManager.Instance.Pause();
+            
             TowerGridSystem.Instance.ToggleGridVizualization();
             inTowerBuildMenu = !inTowerBuildMenu;
+            if (!inPauseMenu)
+            {
+                if (inTowerBuildMenu)
+                    LevelManager.Instance.Pause();
+                else
+                    LevelManager.Instance.Resume();
+            }
             // TODO: Сделать плавный переход
             if (inTowerBuildMenu)
             {
-                //TowerBuildLabel.text = "Close";
                 ShowHideTowerBuildMenuImg.rotation = Quaternion.Euler(0, 0, -90);
                 TowerBuildPanel.localPosition = new Vector3(TowerBuildPanel.localPosition.x, TowerBuildPanel.localPosition.y + towerPanelUISize, TowerBuildPanel.localPosition.z);
             }
             else
             {
                 ShowHideTowerBuildMenuImg.rotation = Quaternion.Euler(0, 0, 90);
-               // TowerBuildLabel.text = "Open";
                 TowerBuildPanel.localPosition = new Vector3(TowerBuildPanel.localPosition.x, TowerBuildPanel.localPosition.y - towerPanelUISize, TowerBuildPanel.localPosition.z);
             }
         }
-
+        
         // Меняет номер выбранной башни
         public void SwitchSelectedTower(GameObject go,int newID) {
             selectedTower = newID;
@@ -420,9 +471,26 @@ namespace TD
             if (inPauseMenu)
                 TogglePauseMenu();
             EndLevelDialog.gameObject.SetActive(true);
-            EndLevelDialogHeaderLabel.text = won ? "Congratulations you won!" : "You ara a failure, we lost a war to these ugly spheres!";
+            EndLevelDialogHeaderLabel.text = won ? "Congratulations you won!" : "You lost! Want to try again?";
             levelEnded = true;
+            Star1.color = won ? Color.white : Color.black;
+            Star2.color = (LevelManager.Instance.CurrentLevel.GetMainTowerLifeCount() / mainTowerLifeCount>0.4f) ? Color.white : Color.black;
+            Star3.color = (LevelManager.Instance.CurrentLevel.GetMainTowerLifeCount() / mainTowerLifeCount > 0.6f) ? Color.white : Color.black;
             LevelManager.Instance.Pause();
+        }
+
+        public void ShowTutorialMessage(string message)
+        {
+            inTutorialMessage = true;
+            LevelManager.Instance.Pause();
+            TutorialDialog.SetActive(true);
+            TutorialDialogLabel.text = message;
+        }
+        public void HideTutorialMessage()
+        {
+            inTutorialMessage = false;
+            LevelManager.Instance.Resume();
+            TutorialDialog.SetActive(false);
         }
     }
 }

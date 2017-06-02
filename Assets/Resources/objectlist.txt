@@ -1,6 +1,7 @@
 npclistblock
 NPC0 NPC/npc0
 NPC1 NPC/npc1
+NPC2 NPC/npc2
 end
 towerlistblock
 Tower Towers/BaseTower

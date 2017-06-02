@@ -1,5 +1,5 @@
 Levels
-testlevel1#hello boys and girls, welcome to test level 1!#Textures/facebook
-testlevel2#hello boys and girls, welcome to test level 2!#Textures/twitter
-testlevel3#hello boys and girls, welcome to test level 3!#Textures/Topru
+level_01#Oh, no! Horrible slimes almost conquer the Kingdom! Don't let them near the Castle!#Textures/facebook
+level_02#You held the line last time, but still there is lot's of them! Don't let them near the Castle!#Textures/twitter
+level_03#The King is pleased with your work, but there is stil a last horde! Don't let them near the Castle!#Textures/Topru
 end
