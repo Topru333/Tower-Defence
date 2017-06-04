@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -36,5 +37,16 @@ namespace TD
                 return _instance;
             }
         }
+    }
+    public static class Logger
+    {
+
+        [Conditional("ENABLE_LOGS")]
+
+        public static void Log(string logMsg)
+        {
+            UnityEngine.Debug.Log(logMsg);
+        }
+
     }
 }

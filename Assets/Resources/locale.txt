@@ -1,0 +1,29 @@
+Русский$English
+langblock
+Уровни$Levels
+Настройки$Settings
+Звук$Volume
+Графика$Quality
+Язык$Launguage
+Высоко$High
+Средне$Medium
+Низко$Low
+Назад$Back
+Опыт$Exp
+Волна$Wave
+Хорошо$Ok
+Пропустить обучение$Skip tutorial
+Это меню паузы. Здесь вы можете перзагрузить текущий уровень или выйти в главное меню.$This is pause menu. Here you can reboot current level or quit to main menu.
+Русский$Russian
+Английский$English
+Это панель постройки башен.$This is tower building menu.
+Чтобы построить башню перетащите ее на поле боя.$To build a tower drag it on the battlefield.
+Коснитесь построенной башни и удерживая перетащите вверх или вниз, чтобы прокачать или продать ее.$Touch tower and drag up or down to upgrade it or sell it.
+Нажмите эту кнопку и вы перейдете в режим защиты.$Press this button and you'll go into defense mode.
+Устали ждать? Нажмите эту кнопку чтобы ускорить игру!$Tired of waiting? Press this button to speed up game!
+Слишком быстро? Нажмите эту кнопку чтобы замедлить игру!$Too fast? Press this button again to slow it down!
+Здесь показано количество вашего опыта, опыт дается за каждого уничтоженого врага. Постарайтесь получить больше опыта, от этого зависит исход сражения!$Here you can see the amount of experience, you'll get more for each enemy you destroy. Try to get more experience, to get better results!
+Однако это не все, за каждого уничтоженого врага вы получаете золото. Вы можете потратить его на прокачку башен или покупку новых.$But that's not all, for each destroyed enemy you'll get gold. You can spend it to upgrade your towers or to buy new ones.
+Это состояние главной башни, если оно достигнет нуля вы проиграете.$This is your lifecount. If it reaches zero - you'll lose.
+Вы готовы? С этого момента ваше обучение окончено! Не дайте им добраться до конца уровня!$Are you ready? From now on you're on your own! Don't let them get to the end of the level!
+end

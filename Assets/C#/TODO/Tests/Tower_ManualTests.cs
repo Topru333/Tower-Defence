@@ -23,7 +23,7 @@ namespace TD.Tests
                 tgs.LoadData(sr);
 
             if (!tgs.BuildTowerAt(position, tower))
-                Debug.Log(tgs.GetCellInfo(position));
+                Logger.Log(tgs.GetCellInfo(position).ToString());
         }
 
         // Update is called once per frame
@@ -45,12 +45,12 @@ namespace TD.Tests
                 if (GUILayout.Button("UpdatePos"))
                 {
                     tgs.transform.SetPositionAndRotation(((Tower_ManualTests)target).gridPos, Quaternion.identity);
-                    Debug.Log(tgs);
+                    Logger.Log(tgs.ToString());
                 }
                 if (GUILayout.Button("BuildTower"))
                 {
                     if (!tgs.BuildTowerAt(((Tower_ManualTests)target).position, ((Tower_ManualTests)target).tower))
-                        Debug.Log(tgs.GetCellInfo(((Tower_ManualTests)target).position));
+                        Logger.Log(tgs.GetCellInfo(((Tower_ManualTests)target).position).ToString());
                 }
                 if (GUILayout.Button("ReloadData"))
                 {

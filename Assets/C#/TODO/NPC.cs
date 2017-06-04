@@ -59,9 +59,7 @@ namespace TD
             {
                 LevelManager.Instance.CurrentLevel.DamageMainTower(MainTowerDamage);
                 LevelManager.Instance.CurrentLevel.DecreaseNPC_Counter();
-#if DEBUG
-                Debug.Log(string.Format("Отладка:{0}: NPC нанес урон главной башне - {1}.", name, MainTowerDamage));
-#endif
+                Logger.Log(string.Format("Отладка:{0}: NPC нанес урон главной башне - {1}.", name, MainTowerDamage));
                 Destroy(gameObject);
             }
             else
@@ -92,9 +90,7 @@ namespace TD
             {
                 Animator.SetTrigger(hitAnimHash);
             }
-#if DEBUG
-            Debug.Log(string.Format("Отладка:{0}: NPC нанесен урон - {1}, значение жизней - {2}.", name, damagePoints, Health));
-#endif
+            Logger.Log(string.Format("Отладка:{0}: NPC нанесен урон - {1}, значение жизней - {2}.", name, damagePoints, Health));
             if (Health <= 0)
                 Death();
         }
@@ -103,9 +99,7 @@ namespace TD
         void Death()
         {
             if (isDead) return;
-#if DEBUG
-            Debug.Log(string.Format("Отладка:{0}: NPC умер.", name));
-#endif
+            Logger.Log(string.Format("Отладка:{0}: NPC умер.", name));
             isDead = true;
             var currentLvl = LevelManager.Instance.CurrentLevel;
             currentLvl.DecreaseNPC_Counter();

@@ -97,17 +97,11 @@ namespace TD
         // Метод загрузки уровня
         public void LevelLoad(string name)
         {
-            //Scene levelScene = SceneManager.CreateScene(name);
-            
-            //SceneManager.SetActiveScene(levelScene);
-            //GameObject ingameMenu = Resources.Load<GameObject>("Menus/InGameMenu");
-
             GameObject levelHolder = new GameObject("LevelHolder");
             CurrentLevel = levelHolder.AddComponent<Level>();
             CurrentLevel.level_name = name;
             TextAsset level = Resources.Load<TextAsset>("Levels/" + name);
             Stream levelStream = new MemoryStream(level.bytes);
-            //Instantiate(ingameMenu);
             using (StreamReader sr = new StreamReader(levelStream))
                 CurrentLevel.Load(sr);
         }
@@ -119,7 +113,7 @@ namespace TD
             Time.timeScale = gameSpeed;
         }
 
-        // Переход в режим "пауза"(и обратно)
+        // Переход в режим "пауза"
         public void Pause()
         {
             pause = true;
@@ -129,12 +123,6 @@ namespace TD
         {
             pause = false;
             Time.timeScale = gameSpeed;
-        }
-
-        // Метод завершения уровня
-        public void LevelEnd()
-        {
-
         }
     }
 

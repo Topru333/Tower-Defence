@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -112,6 +113,7 @@ namespace TD
         private Sprite UpgradeSellMenu_SellSelected;
         [SerializeField]
         private Sprite UpgradeSellMenu_UpgradeSelected;
+        private StringBuilder stringBuilderForConcat;
 
         private GameObject towerIcon;    
         private List<GameObject> towerButtons=new List<GameObject>();
@@ -189,6 +191,7 @@ namespace TD
             TowerSellUpgradeDialog.GetComponent<RectTransform>().sizeDelta = new Vector2(sellImageSize, sellImageSize);
             WaveNumberLabel.text = string.Format("Wave:{0}/{1}", wavePast, waveCount);
             HasBuiltTower = IsInDefenseMode = false;
+            stringBuilderForConcat = new StringBuilder(32); 
         }
 
         private void Update()
@@ -326,24 +329,30 @@ namespace TD
         // Обновляет строку с опытом
         public void UpdateExperince(int Exp)
         {
-            ExperienceLabel.text = string.Format("Exp:{0}", Exp);
+            stringBuilderForConcat.Remove(0, stringBuilderForConcat.Length);// Используем stringbuilder для сокращения вызовов сборщика мусора
+            stringBuilderForConcat.Append("Exp:").Append(Exp);
+            ExperienceLabel.text = stringBuilderForConcat.ToString();//string.Format("Exp:{0}", Exp);
         }
 
         // Обновляет строку с номером волны
         public void IncreaseWaveNumber()
         {
-            WaveNumberLabel.text = string.Format("Wave:{0}/{1}", ++wavePast,waveCount);
+            stringBuilderForConcat.Remove(0, stringBuilderForConcat.Length);
+            stringBuilderForConcat.Append("Wave:").Append(++wavePast).Append("/").Append(waveCount);
+            WaveNumberLabel.text = stringBuilderForConcat.ToString();//"Wave:"+ (++wavePast)+"/" + waveCount;
         }
 
         // Обновляет строку с золотом
         public void UpdateGold(int gold)
         {
-            GoldLabel.text = string.Format("{0}", gold);
+            GoldLabel.text = gold.ToString();
         }
 
         public void UpdateMainTowerState(int livesLeft)
         {
-            MainTowerStateLabel.text= string.Format("{0}/{1}", livesLeft, mainTowerLifeCount);
+            stringBuilderForConcat.Remove(0, stringBuilderForConcat.Length);
+            stringBuilderForConcat.Append(livesLeft).Append("/").Append(mainTowerLifeCount);
+            MainTowerStateLabel.text = stringBuilderForConcat.ToString();//livesLeft+"/"+ mainTowerLifeCount;
         }
 
         // Открывает меню паузы
@@ -351,9 +360,8 @@ namespace TD
         {
             if (levelEnded|| inTutorialMessage)
                 return;
-#if DEBUG
-            Debug.Log("Открыто меню паузы.");
-#endif
+            Logger.Log("Открыто меню паузы.");
+
             inPauseMenu = !inPauseMenu;
             PauseResumeImage.sprite = inPauseMenu ? ResumeSprite : PauseSprite;
             DragNDropItem.AllowDragNDrop = !inPauseMenu;
@@ -373,24 +381,19 @@ namespace TD
 
         // Перезапускает уровень, данное действие запускается из меню паузы
         public void RestartGame() {
-#if DEBUG
-            Debug.Log("Рестарт игры.");
-#endif
+            Logger.Log("Рестарт игры.");
             Scene scene = SceneManager.GetActiveScene(); SceneManager.LoadScene(scene.name);
         }
 
         // Показывает меню настроек, данная кнопка запускается из меню паузы
         public void ShowSettingsMenu() {
-#if DEBUG
-            Debug.Log("Открыто меню настроек.");
-#endif
+            Logger.Log("Открыто меню настроек.");
         }
 
         // Возвращает в главное меню, данное действие запускается из меню паузы
         public void ToMainMenu() {
-#if DEBUG
-            Debug.Log("Возврат в главное меню.");
-#endif
+            Logger.Log("Возврат в главное меню.");
+
             if(gameIsSpeedUp)
                 ToggleSpeedUpMode();
             LevelManager.Instance.Resume();
@@ -399,9 +402,8 @@ namespace TD
 
         // Запускает волну NPC и скрывает меню постройки башен
         public void StartWave() {
-#if DEBUG
-            Debug.Log("Вызвана волна NPC.");
-#endif
+            Logger.Log("Вызвана волна NPC.");
+
             if (inPauseMenu|| inTutorialMessage)
                 return;
             LevelManager.Instance.CurrentLevel.WaveStart();
@@ -418,9 +420,8 @@ namespace TD
         }
         // Ускоряет/Замедляет игру
         public void ToggleSpeedUpMode() {
-#if DEBUG
-            Debug.Log("Скорость игры изменена.");
-#endif
+            Logger.Log("Скорость игры изменена.");
+
             if (inTowerBuildMenu||inPauseMenu|| levelEnded|| inTutorialMessage)
                 return;
             gameIsSpeedUp = !gameIsSpeedUp;
@@ -463,9 +464,8 @@ namespace TD
         
         // Показывает диалог окончания уровня
         public void ShowEndLevelDialog(bool won) {
-#if DEBUG
-            Debug.Log("Вызван диалог окончания уровня.");
-#endif
+            Logger.Log("Вызван диалог окончания уровня.");
+
             if (inTowerBuildMenu)
                 ToggleTowerBuildMenu();
             if (inPauseMenu)
@@ -474,8 +474,9 @@ namespace TD
             EndLevelDialogHeaderLabel.text = won ? "Congratulations you won!" : "You lost! Want to try again?";
             levelEnded = true;
             Star1.color = won ? Color.white : Color.black;
-            Star2.color = (LevelManager.Instance.CurrentLevel.GetMainTowerLifeCount() / mainTowerLifeCount>0.4f) ? Color.white : Color.black;
-            Star3.color = (LevelManager.Instance.CurrentLevel.GetMainTowerLifeCount() / mainTowerLifeCount > 0.6f) ? Color.white : Color.black;
+            int lc = LevelManager.Instance.CurrentLevel.GetMainTowerLifeCount();
+            Star2.color = (((float)lc / mainTowerLifeCount) > 0.4f) ? Color.white : Color.black;
+            Star3.color = (((float)lc / mainTowerLifeCount) > 0.6f) ? Color.white : Color.black;
             LevelManager.Instance.Pause();
         }
 

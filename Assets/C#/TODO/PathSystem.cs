@@ -51,11 +51,10 @@ namespace TD
         /// <param name="id">Индекс вершины старта волны</param>
         public void NPCSpawn(NpcWave wave)
         {
-#if DEBUG
-            Debug.LogFormat("Количество волн {0},{1},{2}", wave.count, wave.delay, wave.pathVertexID);
+            Logger.Log(string.Format("Количество волн {0},{1},{2}", wave.count, wave.delay, wave.pathVertexID));
             if (wave.NPC == null) throw new ArgumentNullException("NPCSpawn - wave isn't correct - null");
             if (wave.count <= 0 || wave.delay <= 0 || wave.pathVertexID <= 0 || wave.pathVertexID >= Points.Count) throw new ArgumentOutOfRangeException("NPCSpawn - wave isn't correct");
-#endif
+
             var edgeList = Instance.Edges.FindAll((Edge e) => { return e.ID_in == wave.pathVertexID; });
             if (edgeList != null && edgeList.Count > 0)
             {

@@ -67,10 +67,16 @@ namespace TD
         {
             return mainTowerLifeCount;
         }
+        private void Start()
+        {
+            var ingameUI = IngameUI.Instance;
+            ingameUI.UpdateGold(money);
+            ingameUI.UpdateExperince(experience);
+            ingameUI.UpdateMainTowerState(mainTowerLifeCount);
+        }
 
         private void Update()
         {
-            var ingameUI = IngameUI.Instance;
             if (waves.Count > 0)
             {
                 if (waveStarted && timer <= 0)
@@ -82,16 +88,13 @@ namespace TD
             else if (currentWaveNPC_counter <= 0&& !levelEnded)
             {
                 levelEnded = true;
-                ingameUI.ShowEndLevelDialog(true);
+                IngameUI.Instance.ShowEndLevelDialog(true);
             }
-            ingameUI.UpdateExperince(experience);
-            ingameUI.UpdateGold(money);
-            ingameUI.UpdateMainTowerState(mainTowerLifeCount);
         }
 
         public void GiveMoney(int goldGiven)
         {
-            money += goldGiven;
+            money += goldGiven; IngameUI.Instance.UpdateGold(money);
         }
 
         // Метод вызова волн
@@ -115,9 +118,10 @@ namespace TD
                 mainTowerLifeCount = 0;
             else
                 mainTowerLifeCount -= damage;
-
-            if(mainTowerLifeCount<=0)
-                IngameUI.Instance.ShowEndLevelDialog(false);
+            var ingameUI = IngameUI.Instance;
+            ingameUI.UpdateMainTowerState(mainTowerLifeCount);
+            if (mainTowerLifeCount<=0)
+                ingameUI.ShowEndLevelDialog(false);
         }
 
         public List<GameObject> GetAvaliableToBuildTowers()
@@ -130,7 +134,7 @@ namespace TD
         public bool SpendMoney(int toSpend) {
             if (money >= toSpend)
             {
-                money -= toSpend;
+                money -= toSpend; IngameUI.Instance.UpdateGold(money);
                 return true;
             }
             else
@@ -139,7 +143,7 @@ namespace TD
         // Увеличиваем значение опыта
         public void GiveExperience(int exp)
         {
-            experience += exp;
+            experience += exp; IngameUI.Instance.UpdateExperince(experience);
         }
     }
 }

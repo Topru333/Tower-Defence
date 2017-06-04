@@ -53,6 +53,7 @@ namespace TD
         {
             StartCoroutine("FindTargetsWithDelay", upgradableParameters[upgradeLevel].targetListUpdateFreq);
             gunLine = gameObject.GetComponent<LineRenderer>();
+            gunLine.SetPosition(0, new Vector3(transform.position.x, transform.position.y + 6, transform.position.z));
         }
 
         // Обновление
@@ -114,7 +115,6 @@ namespace TD
                     NPC npc = targetList[i].gameObject.GetComponent<NPC>();
                     npc.DoDamage(upgradableParameters[upgradeLevel].TowerDamage);
                     gunLine.enabled = true;
-                    gunLine.SetPosition(0, new Vector3(transform.position.x,transform.position.y + 6,transform.position.z));
                     gunLine.SetPosition(1, targetList[i].position);
                     StartCoroutine("EffectCloseWithDelay", effectsDisplayTime);
                 }

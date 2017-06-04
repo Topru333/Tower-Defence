@@ -42,6 +42,11 @@ namespace TD.Tests
 
         }
 
+        [Test]
+        public void MainMenuTest() {
+            Assert.AreEqual(10, 10,"Failed Test");
+        }
+
         private static void PathSystem_GetNextEdgeMethodTest(PathSystem ps)
         {
             Assert.Throws<ArgumentNullException>(() =>

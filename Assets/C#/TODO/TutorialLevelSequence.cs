@@ -7,20 +7,21 @@ namespace TD
     {
         [SerializeField]
         private GameObject[] HighlightObjects;
-        private string[] tutorialStrings= { "This is pause menu. Here you can reboot current level or quit to main menu." ,
-                                            "This is tower building menu.",
-                                            "To build a tower drag it on the battlefield.",
-                                            "Touch tower and drag up or down to upgrade it or sell it.",
-                                            "Press this button and you'll go into defense mode.",
-                                            "Tired of waiting? Press this button to speed up game!",
-                                            "Too fast? Press this button again to slow it down!",
-                                            "Here you can see the amount of experience, you'll get more for each enemy you destroy. Try to get more experience, to get better results!",
-                                            "But that's not all, for each destroyed enemy you'll get gold. You can spend it to upgrade your towers or to buy new ones.",
-                                            "This is your lifecount. If it reaches zero - you'll lose.",
-                                            "Are you ready? From now on you're on your own! Don't let them get to the end of the level!"};
+        private string[] tutorialStrings;
         private int tutorialLeft = 0;
         private void Start()
         {
+            tutorialStrings=new string[]{   LocalizationData.GetLocalizedString(14) ,
+                                            LocalizationData.GetLocalizedString(17),
+                                            LocalizationData.GetLocalizedString(18),
+                                            LocalizationData.GetLocalizedString(19),
+                                            LocalizationData.GetLocalizedString(20),
+                                            LocalizationData.GetLocalizedString(21),
+                                            LocalizationData.GetLocalizedString(22),
+                                            LocalizationData.GetLocalizedString(23),
+                                            LocalizationData.GetLocalizedString(24),
+                                            LocalizationData.GetLocalizedString(25),
+                                            LocalizationData.GetLocalizedString(26)};
             IngameUI.Instance.ShowTutorialMessage(tutorialStrings[tutorialLeft]);
             HighlightObjects[tutorialLeft].SetActive(true);
         }
