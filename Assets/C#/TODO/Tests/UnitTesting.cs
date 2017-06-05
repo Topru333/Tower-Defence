@@ -65,22 +65,25 @@ namespace TD.Tests
         public void UtilitiesUnitTest2 () { // Тест на элементы списка
             TextAsset objectList = Resources.Load<TextAsset>("test2");
             Stream objectListStream = new MemoryStream(objectList.bytes);
+            List<string> block = new List<string>();
             using (StreamReader sr = new StreamReader(objectListStream)) {
+                
                 Utilities.ReadBlock(sr, (string _line) => {
                     string[] strSpl = _line.Split(' ');
-                    Assert.AreEqual(strSpl.Length, 2);
+                    Assert.AreEqual(strSpl.Length, 3);
+                    block.Add(""+strSpl.Length);
                 }
+
                     );
 
             };
+            Assert.AreEqual(block.Count, 1);
         }
 
         [Test]
         public void UtilitiesUnitTest3 () { // Тест на элементы списка
-            Assert.Throws<NullReferenceException>(() => {
-                TextAsset objectList = Resources.Load<TextAsset>("test3");
-
-            }, "Файл не найден");
+            TextAsset objectList = Resources.Load<TextAsset>("test3");
+            Assert.AreEqual(objectList, null);
         }
 
 
