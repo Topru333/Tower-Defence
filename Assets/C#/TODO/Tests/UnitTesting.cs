@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
-//using NUnit.Framework;
+using NUnit.Framework;
 using System.Collections.Generic;
 using System;
 using TD;
-/*
+using System.IO;
+
 namespace TD.Tests
 {
     public class UnitTesting
@@ -42,6 +43,48 @@ namespace TD.Tests
 
         }
 
+
+
+
+        [Test]
+        public void UtilitiesUnitTest1 () { //Тест на отсутствие элементов списка
+            TextAsset objectList = Resources.Load<TextAsset>("test1");
+            Stream objectListStream = new MemoryStream(objectList.bytes);
+            using (StreamReader sr = new StreamReader(objectListStream))
+            {
+                Utilities.ReadBlock(sr, (string _line) => {
+                    string[] strSpl = _line.Split(' ');
+                    Assert.AreEqual(strSpl.Length,0);
+                }
+                    );
+
+            };
+        }
+
+        [Test]
+        public void UtilitiesUnitTest2 () { // Тест на элементы списка
+            TextAsset objectList = Resources.Load<TextAsset>("test2");
+            Stream objectListStream = new MemoryStream(objectList.bytes);
+            using (StreamReader sr = new StreamReader(objectListStream)) {
+                Utilities.ReadBlock(sr, (string _line) => {
+                    string[] strSpl = _line.Split(' ');
+                    Assert.AreEqual(strSpl.Length, 2);
+                }
+                    );
+
+            };
+        }
+
+        [Test]
+        public void UtilitiesUnitTest3 () { // Тест на элементы списка
+            Assert.Throws<NullReferenceException>(() => {
+                TextAsset objectList = Resources.Load<TextAsset>("test3");
+
+            }, "Файл не найден");
+        }
+
+
+
         private static void PathSystem_GetNextEdgeMethodTest(PathSystem ps)
         {
             Assert.Throws<ArgumentNullException>(() =>
@@ -70,7 +113,7 @@ namespace TD.Tests
                 NpcWave wave;
                 wave.count = -1;
                 wave.delay = 1;
-                wave.NPC = new GameObject("TestNPC");
+                wave.NPC   = new GameObject("TestNPC");
                 wave.pathVertexID = 0;
                 ps.NPCSpawn(wave);
 
@@ -83,7 +126,7 @@ namespace TD.Tests
                 NpcWave wave;
                 wave.count = 1;
                 wave.delay = -1;
-                wave.NPC = new GameObject("TestNPC");
+                wave.NPC   = new GameObject("TestNPC");
                 wave.pathVertexID = 0;
                 ps.NPCSpawn(wave);
 
@@ -96,7 +139,7 @@ namespace TD.Tests
                 NpcWave wave;
                 wave.count = 1;
                 wave.delay = 1;
-                wave.NPC = null;
+                wave.NPC   = null;
                 wave.pathVertexID = 0;
                 ps.NPCSpawn(wave);
 
@@ -109,7 +152,7 @@ namespace TD.Tests
                 NpcWave wave;
                 wave.count = 1;
                 wave.delay = 1;
-                wave.NPC = new GameObject("TestNPC");
+                wave.NPC   = new GameObject("TestNPC");
                 wave.pathVertexID = 0;
                 ps.NPCSpawn(wave);
 
@@ -122,7 +165,7 @@ namespace TD.Tests
                 NpcWave wave;
                 wave.count = 1;
                 wave.delay = 1;
-                wave.NPC = new GameObject("TestNPC");
+                wave.NPC   = new GameObject("TestNPC");
                 wave.pathVertexID = -1;
                 ps.NPCSpawn(wave);
             }, "Метод NPCSpawn(wave,id) пропустил некорректный параметр id");
@@ -134,7 +177,7 @@ namespace TD.Tests
                 NpcWave wave;
                 wave.count = 1;
                 wave.delay = 1;
-                wave.NPC = new GameObject("TestNPC");
+                wave.NPC   = new GameObject("TestNPC");
                 wave.pathVertexID = 4;
                 ps.NPCSpawn(wave);
             }, "Метод NPCSpawn(wave,id) вылетел с ошибкой");
@@ -147,7 +190,7 @@ namespace TD.Tests
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
                 List<Point> pointList = new List<Point>();
-                List<Edge> edgeList = new List<Edge>();
+                List<Edge>  edgeList  = new List<Edge>();
                 ps.Load(pointList, edgeList);
             }, "Метод Load(points,edges) пропустил элементы с некорректными размерностями");
 
@@ -169,16 +212,13 @@ namespace TD.Tests
         private static void PathSystem_InitPathGraph(out List<Point> pointList, out List<Edge> edgeList)
         {
             pointList = new List<Point>();
-            edgeList = new List<Edge>();
+            edgeList  = new List<Edge>();
             pointList.Add(new Point(1, new Vector2(10, 80)));
             pointList.Add(new Point(2, new Vector2(40, 80)));
 
-            edgeList.Add(new Edge(1, 2));
-
+            edgeList.Add (new Edge(1, 2));
             pointList.Add(new Point(3, new Vector2(40, 60)));
-
-            edgeList.Add(new Edge(2, 3));
+            edgeList.Add (new Edge(2, 3));
         }
     }
 }
-*/
