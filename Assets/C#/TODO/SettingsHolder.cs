@@ -15,14 +15,14 @@ namespace TD
         public static int LaunguageID;
 
         public static void Load() {
-            if(!File.Exists(Application.dataPath + "/settings.set"))
+            if(!File.Exists(Application.persistentDataPath  + "/settings.set"))
             {
                 ResetDefaults();
                 Save();
                 return;
             }
 
-            Stream s = File.OpenRead(Application.dataPath + "/settings.set");
+            Stream s = File.OpenRead(Application.persistentDataPath  + "/settings.set");
             using (StreamReader sr=new StreamReader(s))
             {
                 string str= sr.ReadLine();
@@ -55,7 +55,7 @@ namespace TD
         }
         public static void Save()
         {
-            Stream s = File.Create(Application.dataPath+"/settings.set");
+            Stream s = File.Create(Application.persistentDataPath +"/settings.set");
             using (StreamWriter sw = new StreamWriter(s))
             {
                 sw.WriteLine(SoundVolume);
